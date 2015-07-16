@@ -1,0 +1,74 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=buuf-icon-theme
+pkgver=3.6.0
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="Buuf Icon Theme"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Buuf GNOME Icon Theme by Hybrid Son Of Oxayotl. Based on the buuf theme by fana-m < http://gnome-look.org/content/show.php/buuf+icon+theme?content=44539 >. And all icons were made by mattahan < http://mattahan.deviantart.com/ >, thanks a lot to him for his great work! License: Creative Commons by-nc-sa. Homepage: http://gnome-look.org/content/show.php?content=81153"
+)
+
+source=("http://buuficontheme.free.fr/buuf${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="themes x11-themes"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+go_src_dir
+
+mkdir -p $pkgdir/usr/share/icons/Buuf
+cp -r ./* $pkgdir/usr/share/icons/Buuf || exit 1
+
+#sed -i 's|Name=Buuf 2.30|Name=Buuf|' $pkgdir/usr/share/icons/Buuf/index.theme || exit 1
+}

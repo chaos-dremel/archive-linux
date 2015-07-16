@@ -1,0 +1,43 @@
+pkgname=geany
+pkgver=1.24
+pkgbuild=1
+arch=('auto')
+shortdesc="A fast, light, GTK+ IDE"
+tags="xapps dev-util"
+
+
+srcarc="tar.bz2"
+srcver="${pkgver/_/}"
+srctar="${pkgname}-${srcver}.${srcarc}"
+srcrep="http://download.geany.org"
+source_tar=("${srcrep}/${srctar}")
+source_now=("git:git://github.com/geany/geany.git")
+
+if [[ ! -f "$srcache/${srctar}" && -z "$source" ]]; then
+ wget -c -P $srcache $source_tar
+fi
+
+if [ -f $srcache/${srctar} ]; then
+ source=$source_tar
+else
+ pkgver=${pkgver/_rc*/}
+ source=$source_now
+fi
+
+
+build_deps="perl-xml-parser"
+
+BUILD_SYSTEM="autotools"
+if [[ -z "`echo $source | grep git`" ]]; then
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+else
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./autogen.sh"
+fi
+BUILD_KEYS="--prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libdir=/usr/lib${LIBDIRSUFFIX} \
+    --disable-static \
+    --mandir=/usr/man \
+    --docdir=/usr/doc/${pkgname}-${pkgver}"
+INSTALL_KEYS="DESTDIR=$pkgdir"

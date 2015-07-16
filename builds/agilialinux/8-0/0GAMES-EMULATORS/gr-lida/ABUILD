@@ -1,0 +1,71 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=gr-lida
+pkgver=0.9.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="GR-lida is a frontend for the emulators DOSBox, ScummVM and VDMSound"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Dependence: phonon. http://sharesource.org/project/grlida"
+)
+
+source=("http://dl.sharesource.org/grlida/GR-lida-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="games games-emulation"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+#before_build()
+#{
+#echo ""
+#}
+
+BUILD_SYSTEM="qmake"
+BUILD_KEYS="*.pro PREFIX=/usr"
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+if [ -d $pkgdir/usr/share/doc/GR-lida ]; then
+ if [ -d $pkgdir/usr/doc/${pkgname}-${pkgver}/doc ]; then
+  rm -rfv $pkgdir/usr/doc/${pkgname}-${pkgver} || exit 1
+ fi
+fi
+
+}

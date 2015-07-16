@@ -1,0 +1,64 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=projectM
+pkgver=2.0.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="projectM is an awesome music visualizer"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("projectM is an OpenGL based advanced music visualization program for Linux, Mac OSX, and Windows. It is backward compatible with all the features of Milkdrop 1.x (and now 2.x), but has many new toys and enhancements. Homepage: http://projectm.sourceforge.net/"
+)
+
+source=("http://downloads.sourceforge.net/project/projectm/${pkgver}/${pkgname}-${pkgver}-Source.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="media-plugins utils"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="cmake"
+BUILD_KEYS="-DCMAKE_INSTALL_PREFIX=/usr \
+-DCMAKE_BUILD_TYPE=RELEASE \
+-DLIB_DIR=lib${LIBDIRSUFFIX} \
+-DMAN_INSTALL_DIR=/usr/man \
+../"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

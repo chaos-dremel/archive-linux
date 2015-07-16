@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=FCEUX NES Emulator
+Comment=Play Nintendo ROM files
+Exec=fceux
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=fceux
+Categories=Game;Emulator;

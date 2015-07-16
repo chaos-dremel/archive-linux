@@ -1,0 +1,76 @@
+#!/bin/sh
+
+## Written by hollywoodb (hollywoodb@fastmail.fm)
+
+## Feel free to use, modify, redistribute this script.
+## If you make changes please modify the "Written by"
+## so that I don't recieve emails about a script I
+## did not write.  Thanks.
+
+# Mofified by the SlackBuilds.org project
+# Modified for MOPSLinux by NK <nk-man@yandex.ru>
+
+PRGNAM=pysetuptools
+SRC_NAME=setuptools
+VERSION=0.6c9
+ARCH=${ARCH:-i686}
+BUILD=${BUILD:-1}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=${PKG:-$TMP/package-$SRC_NAME}
+
+if [ "$ARCH" = "i486" ]; then
+ SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+ elif [ "$ARCH" = "i686" ]; then
+     SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+ elif [ "$ARCH" = "x86_64" ]; then
+     SLKCFLAGS="-O2 -fPIC"
+fi
+
+SOURCE=http://pypi.python.org/packages/source/s/setuptools/$SRC_NAME-$VERSION.tar.gz
+if [ ! -e $SRC_NAME-$VERSION.tar.gz ]; then
+	wget -c $SOURCE
+fi
+
+set -e
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+cd $TMP
+rm -rf $SRC_NAME-$VERSION
+tar xvf $CWD/$SRC_NAME-$VERSION.tar.gz
+cd $SRC_NAME-$VERSION
+chown -R root:root .
+chmod -R u+w,go+r-w,a-s .
+
+python setup.py install --root=$PKG
+
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+)
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a PKG-INFO $PKG/usr/doc/$PRGNAM-$VERSION
+install -m 0644 *.txt $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $PKG
+/sbin/makepkg -l y -c n -p $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+
+echo "MPKG"
+mpkg convert $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz || exit 1
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg-setmeta $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz --maintainer-name=$AUTHOR --maintainer-email=$EMAIL
+mpkg gendeps2 $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg tag develop $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz || exit 1
+
+cd $CWD
+tar vczf $PRGNAM-$VERSION-$BUILD.tar.gz slack-desc $PRGNAM.SlackBuild
+
+echo "DONE"

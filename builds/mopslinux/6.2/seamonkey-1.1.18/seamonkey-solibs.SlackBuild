@@ -1,0 +1,103 @@
+#!/bin/sh
+
+# Copyright 2008, 2009  Patrick J. Volkerding, Sebeka, MN, USA
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
+#  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Modified for MOPSLinux <www.mopslinux.org> by NK <nk-man@yandex.ru>
+
+# Create a standalone seamonkey-solibs package for RPM, gxine, etc.
+rm -r $TMP/package-seamonkey-solibs
+mkdir -p $TMP/package-seamonkey-solibs/usr/doc
+cp -a $PKG/usr/doc/seamonkey-$VERSION $TMP/package-seamonkey-solibs/usr/doc
+mkdir -p $TMP/package-seamonkey-solibs/usr/lib${LIBDIRSUFFIX}/seamonkey-${VERSION}
+for file in libfreebl3.chk libfreebl3.so libmozjs.so libnspr4.so libnss3.so \
+  libnssckbi.so libnssutil3.so libplc4.so libplds4.so libsmime3.so \
+  libsoftokn3.chk libsoftokn3.so libssl3.so ; do
+  cp -a $PKG/usr/lib${LIBDIRSUFFIX}/seamonkey-${VERSION}/$file \
+  $TMP/package-seamonkey-solibs/usr/lib${LIBDIRSUFFIX}/seamonkey-${VERSION}
+done
+mkdir $TMP/package-seamonkey-solibs/install
+cat << EOF | sed -e "s#usr/lib#usr/lib${LIBDIRSUFFIX}#g" > $TMP/package-seamonkey-solibs/install/doinst.sh
+( cd usr/lib ; rm -rf seamonkey )
+( cd usr/lib ; ln -sf seamonkey-$VERSION seamonkey )
+if ! grep /usr/lib/seamonkey etc/ld.so.conf 1> /dev/null 2> /dev/null ; then
+  echo "/usr/lib/seamonkey" >> etc/ld.so.conf
+fi
+if [ -x /sbin/ldconfig ]; then
+  /sbin/ldconfig 2> /dev/null
+fi
+EOF
+cat << EOF > $TMP/package-seamonkey-solibs/install/slack-desc
+                |-----handy-ruler------------------------------------------------------|
+seamonkey-solibs: seamonkey-solibs (Shared libraries from Seamonkey)
+seamonkey-solibs:
+seamonkey-solibs: This package contains a subset of the shared libraries from Seamonkey
+seamonkey-solibs: to provide runtime support for programs that require nss, nspr, and
+seamonkey-solibs: js.  These libraries are used in programs like RPM and gxine, and can
+seamonkey-solibs: be used in others.  This package is built from the Seamonkey sources
+seamonkey-solibs: and is provided as a standalone runtime package for people who do not
+seamonkey-solibs: want to install the entire seamonkey package (as for server use).
+seamonkey-solibs:
+seamonkey-solibs: This package is runtime only.  The include files and other files for
+seamonkey-solibs: development can be found in the seamonkey package.
+EOF
+cd $TMP/package-seamonkey-solibs
+/sbin/makepkg -l y -c n -p $TMP/seamonkey-solibs-$VERSION-$ARCH-$BUILD.tgz
+
+echo "MPKG"
+
+  AUTHOR=${AUTHOR:-NK}
+  EMAIL=${EMAIL:-nk-man@yandex.ru}
+
+PRGNAM=seamonkey
+PACKAGE_NAME=$PRGNAM
+TAGS=network,xapps,
+
+  mpkg convert $CWD/$PACKAGE_NAME-$VERSION$SVN-$ARCH-$BUILD.tgz || exit 1
+  mpkg -P gendeps2 $CWD/$PACKAGE_NAME-$VERSION$SVN-$ARCH-$BUILD.tgz || exit 1
+  TAGZ=""
+  for tag in ${TAGS//,/ } ;
+  do
+  TAGZ+="--add-tag=$tag "
+  done
+  if [ -e $CWD/CHANGELOG ]; then
+      TAGZ+="--changelog=$CWD/CHANGELOG "
+  fi
+ 
+  if [ -e $CWD/ADD-DEP ]; then
+      for dep in `cat $CWD/ADD-DEP` ;
+      do
+          TAGZ+="--add-dep=$dep "
+      done
+  fi
+  if [ -e $CWD/REMOVE-DEP ]; then
+      for rd in `cat $CWD/REMOVE-DEP` ;
+      do
+          TAGZ+="--remove-dep=$rd "
+      done
+  fi
+ 
+  mpkg-setmeta $CWD/$PACKAGE_NAME-$VERSION$SVN-$ARCH-$BUILD.tgz --maintainer-name=$AUTHOR --maintainer-email=$EMAIL $TAGZ
+  mpkg-validate $CWD/$PACKAGE_NAME-$VERSION$SVN-$ARCH-$BUILD.tgz
+
+cd $CWD
+tar vczf $PRGNAM-$VERSION-$BUILD.tar.gz slack-desc $PRGNAM.SlackBuild *.desktop *.png *.diff.gz doinst.sh.gz
+
+echo "DONE"

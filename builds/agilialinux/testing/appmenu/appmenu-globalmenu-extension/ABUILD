@@ -1,0 +1,93 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=appmenu-globalmenu-extension
+pkgver=3.9
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Unity global menubar extension for Firefox and Thunderbird"
+#longdesc=(""
+#)
+
+#source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
+#source=("bzr:lp:globalmenu-extension")
+source=("http://bazaar.launchpad.net/~extension-hackers/globalmenu-extension/trunk/tarball/523?start_revid=523")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="libs x11-misc"
+
+#dependencies only needed to build package
+build_deps="autoconf2.13"
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+before_build()
+{
+go_src_dir
+cd ./globalmenu-extension/trunk
+burn_patches
+
+	autoconf-2.13 || exit 1
+	sed -i 's/^ \t/\t/g' config/rules.mk || exit 1
+	sed -i '/^XPIDL_COMPILE[[:space:]]*=/s@\$(LIBXUL_DIST)/@&sdk/@' config/config.mk || exit 1
+}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" \
+	./configure" # --help"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= \
+--with-libxul-sdk=`pkg-config --variable=sdkdir libxul` \
+--with-system-libxul \
+--with-system-nspr \
+--with-system-nss \
+--enable-application=extensions \
+--enable-extensions=globalmenu \
+--disable-tests \
+--disable-necko-wifi \
+--disable-gnomevfs \
+--disable-gnomeui"
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+
+#}

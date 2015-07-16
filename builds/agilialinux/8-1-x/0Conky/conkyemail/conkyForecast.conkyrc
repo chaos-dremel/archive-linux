@@ -1,0 +1,64 @@
+#!/usr/bin/conky -d -c
+##	.conkyrc configuration
+alignment bottom_right
+background yes
+border_margin 1
+border_width 1
+color0 555555			#
+color1 b73c92			# fiolet
+color2 7e5973			# braz 64574e
+color3 a82553			# rozowy f71f84
+color4 5e1014			# bordowy
+color5 282421			# braz
+color6 a7a7a7			# szary
+color7 d29556			# pomaranczowy
+color8 3b342e			# czarny prawie
+color9 525276			# niebiesko-szary
+cpu_avg_samples 2
+default_color bfbfbf		# ciemny 141414
+default_outline_color 000000 	# Black
+default_shade_color 000000	# Black
+double_buffer yes
+draw_borders no
+draw_graph_borders no
+draw_outline no
+draw_shades no
+#gap_x 6
+#gap_y 31
+gap_x 0
+gap_y -5
+max_specials 1024
+max_user_text 10000
+maximum_width 220
+minimum_size 190 0
+net_avg_samples 2
+no_buffers yes
+override_utf8_locale yes
+own_window yes
+own_window_colour 000000	# Black
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+own_window_transparent yes
+own_window_type desktop ## override 	## normal
+own_window_title conky
+pad_percents 2			# to co nizej, miejsc po przecinku
+short_units yes			# krotka wersja podawania wielkosci dyskow np. 612.21M/3.80G
+stippled_borders 3
+text_buffer_size 8000
+total_run_times 0
+update_interval 1.0
+uppercase no
+use_spacer right
+use_xft yes
+xftalpha 0.75
+#xftfont GE Inspira:bold:size=8
+xftfont DejaVu Sans:size=8
+#xftfont Terminus:size=14
+
+imlib_cache_size 0
+
+#${color5}${font bold:size=7}${alignc}Conky v.${conky_version}  |  Kernel ${kernel}
+#LAST UPDATED: ${execi 3600 conkyForecast --datatype=LU}
+
+TEXT
+${alignc}${font Terminus:style=Bold:size=9}${execi 3600 conkyForecast --location=RSXX0063 --datatype=CT} | E-Mail: ${execi 3605 conkyEmail --servertype=IMAP --servername=imap.googlemail.com --username=### --password=*** --ssl} ${font}
+${color}${voffset 1}${execpi 1800 conkyForecast --location=RSXX0063 --template=conkyForecast.template}

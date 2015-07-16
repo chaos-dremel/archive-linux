@@ -1,0 +1,135 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=unetbootin
+pkgver=583
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Create bootable Live Linux USB drives without burning a CD"
+#longdesc=(""
+#)
+
+source=(
+"http://downloads.sourceforge.net/project/unetbootin/UNetbootin/${pkgver}/unetbootin-source-${pkgver}.tar.gz"
+)
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="sys-boot xapps"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+before_build()
+{
+cd "$srcdir"
+ sed -i '/^RESOURCES/d' unetbootin.pro || exit 1
+ lupdate "$pkgname.pro" || exit 1
+ lrelease "$pkgname.pro" || exit 1
+}
+
+BUILD_SYSTEM="qmake"
+BUILD_KEYS="*.pro PREFIX=/usr "DEFINES += NOSTATIC" "RESOURCES -= unetbootin.qrc""
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+cd "$srcdir"
+
+c_sh(){
+# bin
+install -Dm755 "$pkgname" "$pkgdir/usr/bin/${pkgname}bin"
+# sh
+cat << EOF > "$pkgdir/usr/bin/$pkgname"
+#!/bin/sh
+# wrapper script for starting unetbootin with root permissions
+ELF=/usr/bin/unetbootinbin
+
+if [ -z "\$KDE_FULL_SESSION" ]; then
+  if [ -e /usr/bin/gksudo ]; then
+      gksudo \$ELF && exit 0
+  fi
+  if [ -e /usr/bin/gksu ]; then
+      gksu \$ELF && exit 0
+  fi
+  echo "Could not use gksudo or gksu"
+  #\$ELF && exit 0 || exit 1
+fi
+
+if [ -e /usr/bin/kdesudo ]; then
+  kdesudo \$ELF && exit 0
+fi
+if [ -e /usr/bin/kdesu ]; then
+  kdesu \$ELF && exit 0
+fi
+echo "Could not use kdesudo or kdesu"
+
+#if [ -e /usr/bin/pkexec ]; then
+#  pkexec \$ELF && exit 0
+#fi
+#echo "Could not use pkexec"
+
+#\$ELF && exit 0 || exit 1
+EOF
+chmod 755 "$pkgdir/usr/bin/$pkgname"
+}
+c_sh
+#install -Dm755 "$pkgname" "$pkgdir/usr/bin/$pkgname" || exit 1
+
+# lang
+  mkdir -p "$pkgdir/usr/share/$pkgname"
+  install -m644 "$pkgname"_*.qm "$pkgdir/usr/share/$pkgname/" || exit 1
+
+# desktop
+if [ ! -f "$pkgdir/usr/share/applications/$pkgname.desktop" ]; then
+ if [ -f "${pkgname}.desktop" ]; then
+  install -Dm644 "$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname.desktop"
+ fi
+fi
+
+# icon_png
+for i in 16 22 24 32 48 256; do
+ if [ ! -f "$pkgdir/usr/share/icons/hicolor/${i}x${i}/apps/$pkgname.png" ]; then
+  if [ -f "${pkgname}_${i}.png" ]; then
+   install -D "${pkgname}_${i}.png" "$pkgdir/usr/share/icons/hicolor/${i}x${i}/apps/$pkgname.png"
+  fi
+ fi
+done
+
+# icon_svg
+if [ ! -f "$pkgdir/usr/share/icons/hicolor/scalable/apps/$pkgname.svg" ]; then
+ if [ -f "${pkgname}_icons.svg" ]; then
+  install -D ${pkgname}_icons.svg $pkgdir/usr/share/icons/hicolor/scalable/apps/$pkgname.svg
+ fi
+fi
+}

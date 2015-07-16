@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# Slackware build script for Elfin2 (GTK 2.x Theme/Style)
+# Written by NK for MOPSLinux
+# (c) 2009
+
+PRGNAM=elfin2-gtk-theme
+VERSION=${VERSION:-0.3}
+ARCH=noarch
+BUILD=${BUILD:-1}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-$CWD}
+
+SRCPRGNAM=Elfin2
+
+cp -a 66121-$SRCPRGNAM.tar.gz $PRGNAM-$VERSION.tar.gz
+
+set -e
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+mkdir -p $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+tar xzf $CWD/$PRGNAM-$VERSION.tar.gz
+tar xzf $SRCPRGNAM/$SRCPRGNAM-gtk2\&metacity.tar.gz
+
+mkdir -p $PKG/usr/share/themes/$SRCPRGNAM
+cp -a gtk-2.0 $PKG/usr/share/themes/$SRCPRGNAM
+
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+    -exec chmod 755 {} \; -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+    -exec chmod 644 {} \;
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+#cd $TMP/$PRGNAM-$VERSION/$SRCPRGNAM
+#cp -a AUTHORS COPYING DONATE TODO README $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+#cat $CWD/doinst.sh > $PKG/install/doinst.sh
+#cat $CWD/postremove.sh > $PKG/install/postremove.sh
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+
+
+echo "MPKG"
+mpkg convert $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz || exit 1
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg-setmeta $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz --maintainer-name=$AUTHOR --maintainer-email=$EMAIL
+mpkg gendeps2 $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg tag themes $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz || exit 1
+
+cd $CWD
+tar vczf $PRGNAM-$VERSION-$BUILD.tar.gz slack-desc $PRGNAM.SlackBuild 66121-$SRCPRGNAM.tar.gz
+
+echo "DONE"

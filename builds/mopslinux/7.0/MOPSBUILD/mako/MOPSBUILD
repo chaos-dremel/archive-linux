@@ -1,0 +1,64 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=mako
+prgname=Mako
+pkgver=0.3.2
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Mako Templates for Python"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("A super-fast templating language that borrows the  best ideas from the"
+	  "existing templating languages."
+""
+"Homepage: http://www.makotemplates.org/"
+)
+
+source=("http://www.makotemplates.org/downloads/${prgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="dev-python libs"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$prgname-$pkgver
+
+burn_patches
+
+python setup.py install --root=$pkgdir || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

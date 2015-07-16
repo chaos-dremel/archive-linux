@@ -1,0 +1,113 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=qbittorrent
+pkgver=2.8.0_rc3
+pkgbuild=1
+arch=('auto')
+
+shortdesc="qBittorrent: Free and reliable P2P Bittorrent client"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("BitTorrent клиент, написанный на C++ с использованием библиотеки Qt4 и libtorrent-rasterbar. Домашняя страница: http://www.qbittorrent.org"
+)
+
+#"A Bittorrent client using C++ / libtorrent and a Qt4 Graphical User Interface. qBittorrent official website: http://www.qbittorrent.org"
+
+srcver=${pkgver/_/}
+srcsf="http://downloads.sourceforge.net/project/qbittorrent/qbittorrent"
+
+if [ "$pkgver" != "$srcver" ]; then
+ source=("${srcsf}-unstable/${pkgname}-${pkgver/_/}.tar.gz")
+else
+ source=("${srcsf}/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.gz")
+fi
+
+#"http://downloads.sourceforge.net/project/qbittorrent/qbittorrent/${pkgname}-${pkgver}/CHANGELOG_${pkgver//./_}")
+#source=("http://downloads.sourceforge.net/project/qbittorrent/qbittorrent-unstable/${pkgname}-${pkgver/_/}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+
+tags="xapps net-p2p"     	#short and long tags / длинный и короткий тег
+build_deps="" 			#
+
+provides=""
+conflicts=""
+
+adddep="" #libtorrent-rasterbar==0.14.10"
+removedep="" #libtorrent-rasterbar"
+
+#numjobs=2 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+docs=				#additional files should be copied into /usr/docs/${pkgname} dir from sources
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+
+qb_nogui () {
+	echo "qb-nogui"
+
+ARCH=`uname -m`
+if [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+fi
+
+cd $srcdir
+rm -rf ${srcname}-${srcver} || exit 1
+tar xvf $srcache/${srcname}-${srcver}.tar.?z* || exit 1
+go_src_dir
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+	./configure \
+	--prefix=/usr \
+	--disable-geoip-database \
+	--disable-gui \
+	--disable-libnotify \
+	|| exit 1
+make -j2 || make || exit 1
+make install INSTALL_ROOT=$pkgdir || exit 1
+
+find $pkgdir | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+}
+
+}
+
+# configure
+BUILD_SYSTEM="autotools"
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure" # --help"
+BUILD_KEYS="--prefix=/usr --disable-geoip-database"
+# make
+INSTALL_KEYS="INSTALL_ROOT=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+#cp -v $srcache/CHANGELOG_${pkgver//./_} $pkgdir/usr/doc/${pkgname}-${pkgver}/CHANGELOG
+
+# nogui ver
+#qb_nogui
+
+cd $pkgdir/usr/doc/${pkgname}-${pkgver}/
+if [ -f ./README.os2 ]; then rm -v $pkgdir/usr/doc/${pkgname}-${pkgver}/README.os2 || exit 1; fi
+if [ -f ./doc/qbittorrent.1 ]; then rm -v ./doc/qbittorrent*.1 && rmdir -v ./doc || exit 1; fi
+
+echo ""
+}

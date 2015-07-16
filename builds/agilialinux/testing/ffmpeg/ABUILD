@@ -1,0 +1,128 @@
+#ABUILD created by/создан: agr3ss0r, agr3ss0r86 at gmail.com 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=ffmpeg
+pkgver=git`date "+%Y%m%d"`
+pkgbuild=1
+arch=('auto')
+
+shortdesc="a complete solution to record, convert and stream audio and video"
+
+#shortdesc="FFmpeg (Multimedia player, server and encoder)"
+#-ruler---|--------------------------------------------------------------------------|
+#longdesc=("FFmpeg is a complete solution to record, convert and stream audio and video. It includes libavcodec, the leading audio/video codec library. FFmpeg is developed under Linux, but it can compiled under most operating systems, including Windows. Homepage: http://ffmpeg.org/")
+
+source=("")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="libs media-video"
+
+#dependencies only needed to build package
+build_deps="yasm"
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs="doc/TODO doc/*.txt"
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+config_files=("etc/ffserver.conf")
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+git clone git://git.videolan.org/ffmpeg.git $startdir/$pkgname.src/$pkgname
+}
+
+build()
+{
+go_src_dir
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure \
+--prefix=/usr \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--shlibdir=/usr/lib${LIBDIRSUFFIX} \
+--mandir=/usr/man \
+--disable-static \
+--enable-shared \
+--enable-gpl \
+--enable-version3 \
+--enable-nonfree \
+--enable-doc \
+--enable-ffmpeg \
+--enable-ffplay \
+--enable-ffprobe \
+--enable-ffserver \
+--enable-avdevice \
+--enable-avcodec \
+--enable-avformat \
+--enable-swscale \
+--enable-postproc \
+--enable-avfilter \
+--enable-pthreads \
+--enable-x11grab \
+--enable-bzlib \
+--enable-libopencore-amrnb \
+--enable-libopencore-amrwb \
+--enable-libfaac \
+--enable-libmp3lame \
+--enable-libschroedinger \
+--enable-libspeex \
+--enable-libtheora \
+--enable-libvorbis \
+--enable-libvpx \
+--enable-libx264 \
+--enable-libxvid \
+--enable-zlib \
+--disable-debug \
+--enable-vdpau \
+--enable-vaapi \
+--disable-indev=oss \
+--disable-indev=jack \
+--disable-outdev=oss
+
+#--enable-libdirac \
+
+
+make -j${numjobs} || exit 1
+make tools/qt-faststart || exit 1
+make doc/ff{mpeg,play,server}.1 || exit 1
+make DESTDIR="$pkgdir" install install-man || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+mkdir $pkgdir/etc
+cp -av doc/ffserver.conf  $pkgdir/etc/ffserver.conf
+install -D -m755 tools/qt-faststart "$pkgdir/usr/bin/qt-faststart"
+rm -rf ${pkgdir}/usr/doc/${pkgname}-${pkgver}/doc
+}

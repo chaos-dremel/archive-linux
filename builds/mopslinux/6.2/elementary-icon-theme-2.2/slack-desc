@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+                     |-----handy-ruler------------------------------------------------------|
+elementary-icon-theme: elementary Icons (GNOME Icon Theme)
+elementary-icon-theme:
+elementary-icon-theme: Icons that focus on simplicity and clarity while being realistic. 
+elementary-icon-theme: They are inspired by many different popular icon sets, such as 
+elementary-icon-theme: Tango, Crystal, Developers Icons, Elements Icon Suite, etc. 
+elementary-icon-theme: License: GPL. 
+elementary-icon-theme:
+elementary-icon-theme: Homepage:
+elementary-icon-theme: http://gnome-look.org/content/show.php/elementary+Icons?content=73439
+elementary-icon-theme:
+elementary-icon-theme:

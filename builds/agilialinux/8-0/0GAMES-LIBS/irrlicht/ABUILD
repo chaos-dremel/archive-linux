@@ -1,0 +1,190 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=irrlicht
+
+#pkgver=1.7.3
+pkgver=1.8
+
+# need irrlicht 1.8.
+# > While irrlicht 1.8 is not released, we recommend using version 3629 from irrlicht SVN trunk.
+
+pkgbuild=1_b2lt
+arch=('auto')
+
+shortdesc="Irrlicht Engine - A free open source 3d engine"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("The Irrlicht Engine is an open source high performance realtime 3D engine written and usable in C++. It is completely cross-platform, using D3D, OpenGL and its own software renderers. Homepage: http://irrlicht.sourceforge.net"
+)
+
+#source=("http://downloads.sourceforge.net/project/irrlicht/Irrlicht%20SDK/1.7/${pkgver}/${pkgname}-${pkgver}.zip")
+#source=("svn:https://irrlicht.svn.sourceforge.net/svnroot/irrlicht/branches/releases/1.7/")
+source=("svn:https://irrlicht.svn.sourceforge.net/svnroot/irrlicht/trunk")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="dev-libs libs"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist= #"iex"
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs="changes.txt readme.txt"
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+
+# SVN
+find $srcdir/$pkgname.src -name ".svn" -type d -exec rm -rfv {} ";"
+
+# Idea & part of code from
+# http://repos.archlinux.org/wsvn/community/irrlicht/repos/community-i686/PKGBUILD
+
+Ised(){
+
+ #cd $srcdir/$pkgname-$pkgver || exit 1
+ cd $srcdir/$pkgname.src || exit 1
+  #sed -i -e '/^#.*NON_SYSTEM_ZLIB/d' \
+  #       -e '/^#.*NON_SYSTEM_JPEG/d' \
+  #       -e '/^#.*NON_SYSTEM_BZLIB/d' \
+  #       include/IrrCompileConfig.h
+
+ cd source/Irrlicht || exit 1
+  sed -i -e '/^CXXFLAGS/s:-g.*::' \
+         -e '/^CXXFLAGS/s:-Wall::' \
+         -e '/^CFLAGS/s/:= -O3 -fexpensive-optimizations/+=/' \
+         -e '/^CXXINCS/s:-Izlib -Ijpeglib::' \
+         -e '/^ZLIBOBJ/d' \
+         -e '/^JPEGLIBOBJ/d' \
+         -e '/^BZIP2OBJ/d' \
+         -e '/.o=.d/d' \
+         -e '/^sharedlib: LDFLAGS/s:+=:+= -lGL -lXxf86vm -ljpeg -lbz2 -lz:' \
+         -e "/^INSTALL_DIR/s:=.*:=$pkgdir/usr/lib${LIBDIRSUFFIX}:" \
+         -e 's/0-SVN/1/' \
+         -e 's/.$(VERSION_MINOR) -o/ -o/' \
+         Makefile
+}
+Ised
+
+cd $srcdir/$pkgname.src/source/Irrlicht || exit 1
+make sharedlib || exit 1
+make || exit 1
+
+  install -d $pkgdir/usr/lib${LIBDIRSUFFIX}
+
+make install || exit 1
+
+#
+#cd $srcdir/$pkgname-$pkgver/
+cd $srcdir/$pkgname.src || exit 1
+
+  # $docs
+  #install -m644 readme.txt $pkgdir/usr/doc/${pkgname}-${pkgver}
+
+  # Install static library and fix headers permissions
+  install -m644 lib/Linux/libIrrlicht.a $pkgdir/usr/lib${LIBDIRSUFFIX} || exit 1
+  chmod 644 $pkgdir/usr/include/$pkgname/* || exit 1
+
+  # Install documentation
+  #rm -fv doc/*.txt
+  #cp -r doc/* $pkgdir/usr/doc/${pkgname}-${pkgver}
+
+  cd $pkgdir/usr/lib${LIBDIRSUFFIX}
+  #ln -s libIrrlicht.so.$pkgver libIrrlicht.so.1
+#ln -s libIrrlicht.so.1.7.2-SVN libIrrlicht.so.1
+ln -s libIrrlicht.so.1.8.1 libIrrlicht.so.1
+
+}
+
+
+# 
+iex(){
+	pkgname="${p_pkgname}-examples"
+	arch=('auto')
+	shortdesc="Irrlicht Engine: examples and media files"
+	#-ruler---|--------------------------------------------------------------------------|
+	longdesc=("Irrlicht Engine - A free open source 3d engine")
+	adddep="${p_pkgname}==${pkgver}"
+}
+iex_prep(){
+echo "--------------------------------------------------------------------------"
+echo "examples"
+sleep 5
+
+exdir="$pkgdir/usr/share/irrlicht/examples" #/bin/"
+install -d $exdir
+
+exsrc="$srcdir/irrlicht.src"
+cd $exsrc
+
+  # Install media files for examples
+  cp -r media $pkgdir/usr/share/irrlicht || exit 1
+
+  # Just a helper for examples compilation
+  #ln -s libIrrlicht.so.$pkgver $srcdir/$pkgname-$pkgver/lib/Linux/libIrrlicht.so
+#ln -s libIrrlicht.so.1.7.2-SVN $exsrcdir/lib/Linux/libIrrlicht.so
+ln -s libIrrlicht.so.1.8.1 $exsrc/lib/Linux/libIrrlicht.so
+
+  # Edit, build and install the examples
+
+#cd $srcdir/$pkgname-$pkgver/examples
+cd $exsrc/examples || exit 1
+
+  sed -i '/define USE_IRRKLANG/s:.*://&:' ./Demo/CDemo.h
+  sed -i '/^CXXFLAGS/d' $(grep -Rl "^CXXFLAGS =" *)
+
+make || exit 1
+
+install -m755 ../bin/Linux/* $exdir
+
+echo ""
+echo "--------------------------------------------------------------------------"
+sleep 5
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+# trunk/1.8
+if [ -e $pkgdir/usr/lib${LIBDIRSUFFIX}/1.8 ]; then
+	mv -v $pkgdir/usr/lib${LIBDIRSUFFIX}/1.8 \
+		$pkgdir/usr/lib${LIBDIRSUFFIX}/libIrrlicht.so || exit 1
+fi
+
+echo ""
+}

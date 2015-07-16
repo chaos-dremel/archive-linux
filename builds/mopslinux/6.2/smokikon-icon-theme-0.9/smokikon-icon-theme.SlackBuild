@@ -1,0 +1,73 @@
+#!/bin/sh
+
+# Slackware build script for Smokikon (GNOME Icon Theme)
+# Written for MOPSLinux <www.mopslinux.org> by NK <nk-man@yandex.ru>
+# (c) 2009
+
+PRGNAM=smokikon-icon-theme
+VERSION=${VERSION:-0.9}
+ARCH=noarch
+BUILD=${BUILD:-1}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-$CWD}
+
+#URL: http://www.gnome-look.org/CONTENT/content-files/90577-Smokikon_v09.tar.gz
+SRCPRGNAM=90577-Smokikon_v09
+ARC=${ARC:-tar.gz}
+SRC=http://www.gnome-look.org/CONTENT/content-files/$SRCPRGNAM.$ARC
+if [ ! -e $SRCPRGNAM.$ARC ]; then
+	wget -c $SRC
+fi
+
+set -e
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+mkdir -p $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+tar xvf $CWD/$SRCPRGNAM.tar.?z* || exit 1
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+mkdir -p $PKG/usr/share/icons
+cp -a * $PKG/usr/share/icons
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+#cat $CWD/doinst.sh > $PKG/install/doinst.sh
+cat $CWD/postremove.sh > $PKG/install/postremove.sh
+
+cd $PKG
+
+#if [ ! -e $CWD/slack-required ]; then
+#    echo "Generating dependencies. This make take a few minutes to complete."
+#    requiredbuilder -v -y -s $CWD $PKG
+#else
+#    cat $CWD/slack-required > $PKG/install/slack-required
+#fi
+
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+
+echo "MPKG"
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg convert $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg -P gendeps2 $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg-setmeta $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz \
+  --maintainer-name=$AUTHOR --maintainer-email=$EMAIL --add-tag=icons
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz
+
+cd $CWD
+tar vczf $PACKAGE_NAME-$VERSION-$BUILD.tar.gz slack-desc $PACKAGE_NAME.SlackBuild *.sh
+
+#echo "delete build garbage"
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*
+
+echo "DONE"

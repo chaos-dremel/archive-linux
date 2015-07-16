@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# Slackware build script for Aurora Leopard Mod (GTK 2.x Theme/Style) 
+
+# Copyright 2009 NK <nk-man@yandex.ru>
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+PRGNAM=aurora-leopard-mod-gtk-theme
+VERSION=1.2
+ARCH=noarch
+BUILD=${BUILD:-1}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+
+set -e
+
+SRCPRG=96685-Aurora%20Leopard%20Mod.tar.gz
+SRCVER=$VERSION
+SRC=http://www.gnome-look.org/CONTENT/content-files/$SRCPRG
+if [ ! -e $SRCPRG ]; then
+	wget -c $SRC
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+cd $TMP
+
+rm -rf $PRGNAM-$VERSION
+mkdir -p $PRGNAM-$VERSION
+cd $PRGNAM-$VERSION
+
+rm -rf Aurora%20Leopard%20Mod
+tar xvf $CWD/96685-Aurora\ Leopard\ Mod.tar.?z* || exit 1
+cd Aurora\ Leopard\ Mod
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+echo "Name=Aurora Leopard Mod" >> index.theme
+rm -rf metacity-1 gtk-2.0/*~
+chmod -R a+x .
+
+mkdir -p $PKG/usr/share/themes/Aurora-Leopard-Mod
+cp -a * $PKG/usr/share/themes/Aurora-Leopard-Mod
+
+# Add a documentation directory:
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+chmod 644 $PKG/usr/doc/$PRGNAM-$VERSION/*
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $CWD
+mkdir -p $PKG/usr/src/SlackBuilds
+tar Jcf $PKG/usr/src/SlackBuilds/${PRGNAM}.build_tree.tar.xz --ignore-failed-read \
+	$PRGNAM.SlackBuild slack-desc *.sh.gz *.sh *.desktop patches/ ADD-DEP
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg-setmeta $PKG --keep-symlinks --name=${PACKAGE_NAME} \
+	--maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+	--version=${VERSION} --arch=${ARCH} --build ${BUILD} \
+	--add-dep="aurora-gtk-engine>=1.5.1" \
+	--add-tag=x11-themes --add-tag=themes
+mpkg -P -G gendeps2 $PKG
+
+cd $PKG
+/sbin/makepkg -l n -c n -p $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.t?z
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*

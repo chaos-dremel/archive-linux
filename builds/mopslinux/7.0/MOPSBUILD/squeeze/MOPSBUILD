@@ -1,0 +1,79 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=squeeze
+pkgver=0.2.4
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Squeeze, a modern and advanced archive manager"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Squeeze is a modern and advanced archive manager for the Xfce Desktop"
+          "Environment. Its design adheres to the Xfce philosophy, which basically" 
+          "means Squeeze is designed to be both fast and easy to use."
+""
+          "Homepage: http://squeeze.xfce.org/"
+)
+
+source=("git:git://git.xfce.org/apps/squeeze")
+#http://squeeze.xfce.org/downloads/${pkgname}-${pkgver}.tar.bz2")
+#docs=("AUTHORS ChangeLog COPYING INSTALL NEWS README TODO")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="xfce app-arch"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+numjobs=2 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname #-$pkgver
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./autogen.sh --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= 
+                  
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

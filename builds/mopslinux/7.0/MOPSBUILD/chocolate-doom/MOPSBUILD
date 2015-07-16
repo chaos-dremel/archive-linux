@@ -1,0 +1,74 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=chocolate-doom
+pkgver=1.3.0
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Chocolate Doom"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Chocolate Doom is a Doom source port which aims to reproduce the behavior"
+	  "of Vanilla Doom as closely as possible. http://www.chocolate-doom.org"
+)
+
+source=("http://downloads.sourceforge.net/project/chocolate-doom/chocolate-doom/1.3.0/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="games games-fps"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= 
+                  
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

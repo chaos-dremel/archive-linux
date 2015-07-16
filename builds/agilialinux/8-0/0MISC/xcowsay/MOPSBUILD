@@ -1,0 +1,75 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=xcowsay
+pkgver=1.2
+pkgbuild=1
+arch=('auto')
+
+shortdesc="xcowsay displays a cute cow and message on your Linux desktop"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Display a cow with a speech bubble containing some text."
+""
+	  "Homepage: http://www.doof.me.uk/xcowsay/"
+)
+
+source=("http://www.nickg.me.uk/files/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="utils games-misc"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= 
+                  
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

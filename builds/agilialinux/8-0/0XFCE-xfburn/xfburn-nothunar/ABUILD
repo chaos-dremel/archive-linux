@@ -1,0 +1,139 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=xfburn-nothunar
+pkgver=0.4.3
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Приложение для записи CD и DVD"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Xfburn is a simple CD/DVD burning tool based on libburnia libraries. It"
+	  "can blank CD/DVD(-RW)s, burn and create iso images, audio CDs, as well as"
+	  "burn personal compositions of data to either CD or DVD."
+""
+	  "Warning! Xfburn-nothunar - xfburn with no thunar dependencies."
+""
+	  "Homepage: http://www.xfce.org/projects/xfburn"
+)
+
+source=("git:http://git.xfce.org/git/apps/xfburn")
+#source=("git:git://git.xfce.org/apps/xfburn")
+
+#source=("http://archive.xfce.org/src/apps/xfburn/0.4/xfburn-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="xfce app-cdr"
+
+#dependencies only needed to build package
+build_deps="linuxdoc-tools xfce4-dev-tools libburn libisofs libxfcegui4 libxfce4util exo" # xfconf
+
+provides="xfburn"
+conflicts=""
+
+adddep= #"exo==0.5.3_git20101109"
+removedep= #"exo" #linuxdoc-tools xfce4-dev-tools"
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="autotools"
+
+#BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" \
+#	./configure" # --help"
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" \
+	./autogen.sh" # --help"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc/xfce \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= \
+	--disable-thunar-vfs \
+	--disable-hal \
+	--disable-debug \
+	--enable-gstreamer \
+	--enable-dbus \
+--enable-final || exit 1"
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+if [ -d $pkgdir/usr/doc/${pkgname}-${pkgver}/docs ]; then
+ rm -rfv $pkgdir/usr/doc/${pkgname}-${pkgver}/docs || exit 1
+fi
+
+icon_desktop(){
+
+if [ ! -d $pkgdir/usr/share/applications ]; then
+	mkdir -p $pkgdir/usr/share/applications || exit 1
+fi
+
+# Burn
+cat << EOF > ${pkgdir}/usr/share/applications/${pkgname/-nothunar/}.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Xfburn
+Name[ru]=Xfburn
+Name[uk]=Програма запису Xfburn
+Comment=CD and DVD burning application
+Comment[ru]=Приложение для записи CD и DVD
+Comment[uk]=Програма для запису CD та DVD
+Exec=xfburn
+TryExec=xfburn
+Icon=media-cdrom
+MimeType=application/x-cd-image
+Terminal=false
+Categories=X-XFCE;GTK;DiscBurning;Archiving;AudioVideo;
+StartupNotify=true
+EOF
+
+# Burn Image
+cat << EOF > ${pkgdir}/usr/share/applications/${pkgname/-nothunar/}_iso.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Burn Image (xfburn)
+Name[ru]=Записать образ (xfburn)
+Name[uk]=Записати образ (xfburn)
+Exec=xfburn -i %f
+TryExec=xfburn
+Icon=media-cdrom
+MimeType=application/x-cd-image
+Terminal=false
+Categories=X-XFCE;GTK;DiscBurning;Archiving;AudioVideo;
+StartupNotify=true
+EOF
+}
+#icon_desktop
+}

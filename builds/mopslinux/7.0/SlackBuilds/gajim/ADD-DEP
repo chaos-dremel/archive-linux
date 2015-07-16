@@ -1,0 +1,9 @@
+pyOpenSSL>=0.10
+pygobject>=2.20.0
+pycairo>=1.8.4
+pygtk>=2.16.0
+dbus-python>=0.83.0
+gtkspell>=2.0.15
+aspell>=0.60.5
+aspell-en>=6.0_0
+aspell-ru>=0.99f7_1

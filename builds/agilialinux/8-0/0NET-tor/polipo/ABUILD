@@ -1,0 +1,93 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=polipo
+pkgver=1.0.4.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Polipo — a caching web proxy"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Polipo is a small and fast caching web proxy (a web cache, an HTTP proxy, a proxy server). While Polipo was designed to be used by one person or a small group of people, there is nothing that prevents it from being used by a larger group. Homepage: http://www.pps.jussieu.fr/~jch/software/polipo/"
+)
+
+source=("http://freehaven.net/~chrisd/polipo/polipo-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="network net-proxy"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+
+#burn_patches
+
+#make CDEBUGFLAGS="$SLKCFLAGS"
+#make install DESTDIR=$pkgdir
+
+  make CDEBUGFLAGS="$SLKCFLAGS" all || exit 1
+
+  make  DESTDIR="$pkgdir" \
+	PREFIX="$pkgdir/usr" \
+	LOCAL_ROOT="$pkgdir/usr/share/polipo/www" \
+	DISK_CACHE_ROOT="$pkgdir/var/cache/polipo" \
+  install || exit 1
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+install -Dm755 $filedir/polipo.initd \
+	$pkgdir/etc/init.d/polipo || exit 1
+install -Dm 644 $filedir/polipo.tor \
+	$pkgdir/etc/polipo/config.new || exit 1 
+
+go_src_dir
+  install -Dm 644 config.sample $pkgdir/etc/polipo/config.orig-${pkgver}
+  install -Dm 644 forbidden.sample $pkgdir/etc/polipo/
+
+mkdir -p $pkgdir/var/{run,cache}/polipo/
+
+	mkdir -p $pkgdir/etc/rc.d
+	cat $filedir/rc.polipo > $pkgdir/etc/rc.d/rc.polipo.new
+}

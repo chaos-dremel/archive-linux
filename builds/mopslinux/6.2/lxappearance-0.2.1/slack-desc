@@ -1,0 +1,27 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+            |-----handy-ruler------------------------------------------------------|
+lxappearance: a new feature-rich GTK+ theme switcher
+lxappearance: 
+lxappearance: LXAppearance is a new feature-rich GTK+ theme switcher able to change 
+lxappearance: GTK+ themes, icon themes, and fonts used by applications.
+lxappearance: 
+lxappearance: GNOME/KDE/XFce user may use build-in theme, this works for GTK+ based 
+lxappearance: lightweight desktop Environment.
+lxappearance: 
+lxappearance: Features:
+lxappearance:  * Choose GTK+ theme
+lxappearance:  * Choose icon theme
+lxappearance:  * Install new icon theme
+lxappearance:  * Choose their favorite font
+lxappearance:  * Choose toolbar style
+lxappearance:  * See changes immediately in preview area
+lxappearance: 
+lxappearance: LXAppearance is developed from LXDE(the Lightweight X11 Desktop Enviro
+lxappearance: nment) project. But it works on other GTK+ based system too. 
+lxappearance: 

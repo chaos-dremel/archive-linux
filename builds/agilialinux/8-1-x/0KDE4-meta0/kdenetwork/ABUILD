@@ -1,0 +1,20 @@
+pkgname=kdenetwork
+pkgver=4.11.0
+pkgbuild=1
+arch=noarch
+shortdesc=('Network related utilities for the K Desktop Environment')
+tags=('kde-misc virtual')
+
+adddep="kdenetwork-filesharing \
+	kdenetwork-strigi-analyzers \
+	kdnssd \
+	kget \
+	kopete \
+	kppp \
+	krdc \
+	krfb"
+
+build() {
+	echo "Building virtual package"
+}
+

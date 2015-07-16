@@ -1,0 +1,11 @@
+--- pcmanfm-0.5.2.orig/po/ca.po	2009-10-23 00:07:54.000000000 +0400
++++ pcmanfm-0.5.2/po/ca.po	2009-11-04 04:39:16.000000000 +0300
+@@ -301,7 +301,7 @@
+ "Des de fa una setmana\n"
+ "Des de fa un mes\n"
+ "Des de fa un any\n"
+-"Dins el rang de dates seleccionat\n"
++"Dins el rang de dates seleccionat"
+ 
+ #: ../data/ui/find-files.glade.h:15
+ msgid "Audio Files (mp3, ogg,...)"

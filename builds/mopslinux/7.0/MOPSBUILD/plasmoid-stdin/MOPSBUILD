@@ -1,0 +1,78 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=plasmoid-stdin
+pkgver=0.2_beta1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="STDIN Plasmoid"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("This plasmoid executes a process and captures its stdout or stderr output"
+	  "stream, it can also display the content of a local file or a remote file"
+	  "via KIO."
+""
+	  "Homepage:"
+	  "http://kde-look.org/content/show.php/STDIN+Plasmoid?content=92309"
+)
+
+source=("http://kde-look.org/CONTENT/content-files/92309-0.2-beta1.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="kde4 kde-misc"     	#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/0.2-beta1
+
+burn_patches
+
+rm -rf build 
+mkdir build && cd build || exit 1 
+cmake \
+-DCMAKE_C_FLAGS="$SLKCFLAGS" \
+-DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+-DCMAKE_INSTALL_PREFIX=`kde4-config --prefix` \
+-DCMALE_LIB_DIR=/usr/lib${SUFF} ../
+
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+
+# for cp doc
+cp -a ../0.1/* ../0.2/* ./
+
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

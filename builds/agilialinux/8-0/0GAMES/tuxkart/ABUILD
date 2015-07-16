@@ -1,0 +1,91 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=tuxkart
+pkgver=0.4.0
+pkgbuild=4
+arch=('auto')
+
+shortdesc="A racing game starring Tux"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Tuxedo T. Penguin stars in TuxKart! http://tuxkart.sourceforge.net"
+)
+
+source=("http://tuxkart.sourceforge.net/dist/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+
+tags="games-action games"     		#short and long tags / длинный и короткий тег
+build_deps="plib" 			#
+
+provides=""
+conflicts=""
+
+adddep="$pkgname-bin==$pkgver"
+removedep=""
+
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+docs=				#additional files should be copied into /usr/docs/${pkgname} dir from sources
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+#sed -i "s#games#bin#" \
+#	${pkgname}-${pkgver}/src/Makefile.in || exit 1
+}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix="
+
+INSTALL_KEYS="DESTDIR=$pkgdir bindir=/usr/bin"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+mv $pkgdir/usr/share/tuxkart/ $pkgdir/usr/doc/${pkgname}-${pkgver}
+
+mkdir -p $pkgdir/usr/share/{applications,pixmaps}
+
+cp -a $pkgdir/usr/doc/${pkgname}-${pkgver}/tuxkart/title_screen.png \
+	tuxkart_48.png 
+mogrify -resize 48x48 tuxkart_48.png
+mv tuxkart_48.png $pkgdir/usr/share/pixmaps/
+
+cat << EOF > $pkgdir/usr/share/applications/tuxkart.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Name=TuxKart
+Comment=A racing game starring Tux, the penguin
+Exec=tuxkart
+Icon=tuxkart_48
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Game;ArcadeGame;
+EOF
+
+echo ""
+}

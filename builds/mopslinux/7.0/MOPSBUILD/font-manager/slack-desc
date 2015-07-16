@@ -1,0 +1,12 @@
+font-manager: A font management application for the GNOME desktop
+font-manager:
+font-manager: Font Manager is not intended to be a professional-grade font management
+font-manager: solution, but rather a simple application suitable for the needs of most
+font-manager: desktop users, and even some graphics designers who may need to manage
+font-manager: just a few thousand font files.
+font-manager: 
+font-manager: Although designed with the GNOME desktop environment in mind, it should
+font-manager: work well with most major desktop environments such as Xfce,
+font-manager: Enlightenment, and even KDE.
+font-manager: 
+font-manager: Homepage: http://code.google.com/p/font-manager/

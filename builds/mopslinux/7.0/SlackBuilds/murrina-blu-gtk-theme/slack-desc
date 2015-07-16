@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+   
+                     |-----handy-ruler------------------------------------------------------|
+murrina-blu-gtk-theme: MurrinaBlu (GTK 2.x Theme/Style)
+murrina-blu-gtk-theme:
+murrina-blu-gtk-theme: Simple murrine-based theme. 
+murrina-blu-gtk-theme: *Requires the lastest murrine svn to work correctly. 
+murrina-blu-gtk-theme: License: GPL.
+murrina-blu-gtk-theme: 
+murrina-blu-gtk-theme: http://gnome-look.org/
+murrina-blu-gtk-theme:
+murrina-blu-gtk-theme:
+murrina-blu-gtk-theme:
+murrina-blu-gtk-theme:

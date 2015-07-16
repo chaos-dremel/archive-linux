@@ -1,0 +1,103 @@
+#!/bin/sh
+
+# Slackware build script for qmpdclient
+
+# Copyright 2009 Lampus <lampuslam@mail.ru>
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Modified by NK <nk-man@yandex.ru>
+
+NAME=qmpdclient
+VERSION=1.1.2
+ARCH=${ARCH:-i686}
+BUILD=${BUILD:-1}
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$NAME
+DOCS=${DOCS-AUTHORS  COPYING  Changelog  INSTALL  README  THANKSTO}
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+fi
+
+set -e
+
+SRCNAM=$NAME
+SRCVER=$VERSION
+ARC=${ARC:-tar.bz2}
+SRC=http://dump.bitcheese.net/files/dedycec/$SRCNAM-$SRCVER.$ARC
+if [ ! -e $SRCNAM-$SRCVER.$ARC ]; then
+	wget -c $SRC
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+cd $TMP
+rm -rf $NAME-$VERSION
+mkdir -p $NAME-$VERSION
+cd $NAME-$VERSION
+tar -xvf $CWD/$NAME-$VERSION.tar.?z* || exit 1
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+cd $NAME
+
+for i in ./*.pro; do sed 's|^\(PREFIX *=\).*|\1/usr|' $i > `basename $i.tmp`; mv $i.tmp $i; done
+qmake
+make
+make install INSTALL_ROOT=$PKG
+make translate
+make install_translations INSTALL_ROOT=$PKG
+
+find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+
+lrelease lang/*.ts
+cp lang/*.qm $PKG/usr/share/QMPDClient/translations/
+mkdir -p $PKG/usr/doc/$NAME-$VERSION
+cp -a $DOCS \
+  $PKG/usr/doc/$NAME-$VERSION
+cat $CWD/$NAME.SlackBuild > $PKG/usr/doc/$NAME-$VERSION/$NAME.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $PKG
+#requiredbuilder -v -y -s $CWD $PKG
+makepkg -l y -c n $CWD/$NAME-$VERSION-$ARCH-$BUILD.tgz
+
+echo "MPKG"
+PACKAGE_NAME=$NAME
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg convert $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg -P gendeps2 $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg-setmeta $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz \
+  --maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+  --add-tag=xapps --add-tag=audio
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz
+
+cd $CWD
+tar vczf $PACKAGE_NAME-$VERSION-$BUILD.tar.gz slack-desc $NAME.SlackBuild
+rm -rf $PKG $TMP/$NAME-$VERSION /tmp/mpkg*

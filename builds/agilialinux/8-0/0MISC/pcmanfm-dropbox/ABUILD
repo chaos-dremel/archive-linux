@@ -1,0 +1,73 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=pcmanfm-dropbox
+pkgver=0.0
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="PCManFM Dropbox"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Пакет дает возможность без файлового менеджера Nautilus, но при установленном PCManFM, кликая по dropbox-иконке в трее, вызывать последний."
+)
+
+#source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="x11-misc utils"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts="nautilus"
+
+adddep="pcmanfm dropbox"
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+mkdir -p ${pkgdir}/usr/local/bin/
+ln -s /usr/bin/pcmanfm ${pkgdir}/usr/local/bin/nautilus
+
+#mkdir -p ${pkgdir}/usr/bin/
+#ln -s /usr/bin/pcmanfm ${pkgdir}/usr/bin/nautilus
+}

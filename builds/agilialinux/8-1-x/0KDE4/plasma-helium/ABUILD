@@ -1,0 +1,86 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=plasma-helium
+pkgver=3.0.3
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="Light theme for plasma desktop"
+#longdesc=("Light theme for plasma desktop. License: Creative Commons by-nc-sa. http://kde-look.org/content/show.php/Helium?content=125471")
+
+source=("http://kde-look.org/CONTENT/content-files/125471-Helium.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="x11-themes kde4"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep="kdebase-workspace"
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+cd ..
+find -name ".directory" -type f -exec rm -fv {} ";"
+
+  mkdir -p $pkgdir/usr/share/apps/desktoptheme
+  cp -rv Helium $pkgdir/usr/share/apps/desktoptheme
+  chmod -R 755 $pkgdir/usr/share/apps/desktoptheme/Helium
+
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+
+if [ -d ${pkgdir}/usr/doc/${pkgname}-${pkgver} ];then
+mkdir -p ${pkgdir}/usr/doc/${pkgname}-${pkgver}
+fi
+
+if [ ! -f ${pkgdir}/usr/doc/${pkgname}-${pkgver}/ABOUT ]; then
+cat > ${pkgdir}/usr/doc/${pkgname}-${pkgver}/ABOUT << EOF
+Helium (very light theme for plasma)
+Author: Mcder3 < mcder3[at]gmail[dot]com >
+Website: http://koresource.blogspot.com/
+License: Creative Commons by-nc-sa
+EOF
+fi
+
+}

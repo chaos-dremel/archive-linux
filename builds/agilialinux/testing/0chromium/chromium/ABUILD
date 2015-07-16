@@ -1,0 +1,113 @@
+pkgname=chromium
+pkgver=32.0.1700.6
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Chromium browser"
+
+source=("http://gsdview.appspot.com/chromium-browser-official/chromium-${pkgver}.tar.xz")
+
+patch_opts=("")
+
+tags="network www-client"
+build_deps="yasm flex" # nacl-toolchain-newlib"
+
+build() {
+	cd ${srcdir}/chromium-${pkgver}
+	burn_patches
+
+	#set -e
+
+  # CFLAGS are passed through release_extra_cflags below
+  #export -n CFLAGS CXXFLAGS
+
+  # Silence "typedef 'x' locally defined but not used" warnings
+  #CFLAGS+=' -Wno-unused-local-typedefs'
+
+	# For NaCl support in Chromium
+	#ln -s /opt/nacl-toolchain-newlib native_client/toolchain/linux_x86_newlib
+
+  # Prepare NaCL toolchain
+  #mkdir -p native_client/toolchain/linux_x86_newlib
+  #cp -a /opt/nacl-toolchain-newlib native_client/toolchain/linux_x86_newlib
+  #touch native_client/toolchain/linux_x86_newlib/stamp.untar
+
+
+	# Enable proud path
+	CHROMIUM_HOME="usr/lib${LIBDIRSUFFIX}/chromium"
+	# Configure…
+	build/gyp_chromium -f make build/all.gyp --depth=. \
+		 -Dlinux_strip_binary=1 \
+ -Dlinux_use_gold_binary=0 \
+ -Dlinux_use_gold_flags=0 \
+ -Dno_strict_aliasing=1 \
+ -Dffmpeg_branding=Chrome \
+ -Dproprietary_codecs=1 \
+ -Duse_gconf=0 \
+ -Duse_gnome_keyring=0 \
+ -Duse_kerberos=0 \
+ -Duse_system_bzip2=1 \
+ -Duse_system_ffmpeg=0 \
+ -Duse_system_libevent=1 \
+ -Duse_system_libpng=0 \
+ -Duse_system_libjpeg=1 \
+ -Duse_system_libxslt=1 \
+ -Duse_system_libxml=1 \
+ -Duse_system_ssl=0 \
+ -Duse_system_zlib=0 \
+ -Duse_system_yasm=1 \
+ -Ddisable_nacl=1 \
+ -Dlinux_sandbox_path=/usr/lib${LIBDIRSUFFIX}/chromium/chromium-sandbox \
+    $([ "${ARCH}" == "x86_64" ] && echo '-Dtarget_arch=x64' || echo '-Dtarget_arch=ia32') \
+		-Ddisable_pnacl=1 -Duse_gconf=0 -Duse_pulseaudio=0 || exit 1
+
+	make -j${numjobs} chrome chrome_sandbox BUILDTYPE=Release || exit 1
+
+
+	#set +e
+}
+
+
+after_build() {
+	go_src_dir
+	set -e
+	install -m 0755 -D out/Release/chrome ${pkgdir}/${CHROMIUM_HOME}/chromium
+	install -m 4555 -o root -g root -D out/Release/chrome_sandbox \
+		${pkgdir}/${CHROMIUM_HOME}/chromium-sandbox
+		install -m 0644 -D out/Release/chrome.pak \
+		${pkgdir}/${CHROMIUM_HOME}/chrome.pak
+	install -m 0644 -D out/Release/resources.pak \
+		${pkgdir}/${CHROMIUM_HOME}/resources.pak
+	install -m 0755 -D out/Release/libffmpegsumo.so \
+		${pkgdir}/${CHROMIUM_HOME}/libffmpegsumo.so
+	
+	# these links are needed when building with system ffmpeg
+	#ln -s /usr/lib${LIBDIRSUFFIX}/libavcodec.so.52 ${pkgdir}/${CHROMIUM_HOME}/
+	#ln -s /usr/lib${LIBDIRSUFFIX}/libavformat.so.52 ${pkgdir}/${CHROMIUM_HOME}/
+	#ln -s /usr/lib${LIBDIRSUFFIX}/libavutil.so.50 ${pkgdir}/${CHROMIUM_HOME}/
+
+	cp -a out/Release/locales out/Release/resources \
+		${pkgdir}/${CHROMIUM_HOME}/
+	find ${pkgdir}/${CHROMIUM_HOME}/ -name '*.d' -type f -delete
+	install -m 0644 -D out/Release/chrome.1 \
+		${pkgdir}/usr/share/man/man1/chromium.1
+	install -m 0644 -D ${filedir}/chromium.desktop \
+		${pkgdir}/usr/share/applications/chromium.desktop
+
+	for size in 16 22 24 32 48 64 128 256; do
+	 if [ -f chrome/app/theme/chromium/product_logo_${size}.png ]; then
+		install -m 0644 -D \
+			chrome/app/theme/chromium/product_logo_${size}.png \
+			${pkgdir}/usr/share/icons/hicolor/${size}x${size}/apps/chromium.png
+	 elif [ -f chrome/app/theme/default_100_percent/chromium/product_logo_${size}.png ]; then
+		install -m 0644 -D \
+			chrome/app/theme/default_100_percent/chromium/product_logo_${size}.png \
+			${pkgdir}/usr/share/icons/hicolor/${size}x${size}/apps/chromium.png
+	 fi
+	done
+
+	install -m 0755 -D ${filedir}/chromium.sh ${pkgdir}/usr/bin/chromium
+	mkdir -p $pkgdir/usr/share/gnome-control-center/default-apps
+	cp ${filedir}/chromium.xml ${pkgdir}/usr/share/gnome-control-center/default-apps/
+	set +e
+}

@@ -1,0 +1,127 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=psx-emulator
+prgname=pSX
+
+arch_det(){
+ if [ "$(uname -m)" != "x86_64" ]; then
+  arch=x86
+ else
+  arch=x86_64
+ fi
+}
+arch_det
+
+pkgver=1.13
+pkgbuild=1
+
+
+shortdesc="pSX, a freeware PlayStation Emulator"
+#-ruler---|--------------------------------------------------------------------------|
+#longdesc=("pSX emulates the Sony Playstation 1, pretty much everything is emulated and most games run perfectly. One thing that should be noted is that pSX DOES NOT use plugins. The emulator is completely self contained. The emulator has been designed to be as easy and unobtrusive to use as possible - in most cases you will not need to configure anything to use it (except maybe the controls). Note: you will need a PS1 BIOS image (not supplied). Homepage: http://psxemulator.gazaxian.com")
+
+
+source=("http://psxemulator.gazaxian.com/pSX_linux_${pkgver/./_}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="games games-emulation"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+#before_build()
+#{
+#echo ""
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+mkdir -p $pkgdir/opt
+cp -rv ../pSX $pkgdir/opt/ || exit 1
+#mv $pkgdir/opt/pSX/pSX $pkgdir/opt/pSX/psx-bin
+
+#mkdir -p $pkgdir/usr/doc/${pkgname}-${pkgver}
+#mv -v $pkgdir/opt/pSX/readme.txt $pkgdir/usr/doc/${pkgname}-${pkgver} || exit 1
+
+#Bin
+install -Dm755 $filedir/$prgname.sh $pkgdir/usr/bin/$pkgname || exit 1
+ln -s /opt/pSX/pSX $pkgdir/usr/bin/pSX
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+icon_desktop (){
+	echo "Icon"
+# Win-ver
+cd $srcache
+wget -c http://psxemulator.gazaxian.com/pSX_1_13.rar
+
+# extract
+mkdir -p $srcdir/exe
+ unrar x pSX_1_13.rar $srcdir/exe
+cd $srcdir/exe
+ 7z x psxfin.exe -o${srcdir}/exe
+cd ./.rsrc/1033/ICON/
+ convert 7.ico ${pkgname}_48.png || exit 1
+ convert 8.ico ${pkgname}_32.png || exit 1
+ convert 9.ico ${pkgname}_16.png || exit 1
+
+mkdir -p ${pkgdir}/usr/share/icons/hicolor/{16x16,32x32,48x48}/apps || exit 1
+ install -m644 *_16.png ${pkgdir}/usr/share/icons/hicolor/16x16/apps/pSX.png
+ install -m644 *_32.png ${pkgdir}/usr/share/icons/hicolor/32x32/apps/pSX.png
+ install -m644 *_48.png ${pkgdir}/usr/share/icons/hicolor/48x48/apps/pSX.png
+
+mkdir -p $pkgdir/usr/share/applications || exit 1
+ cat << EOF > $pkgdir/usr/share/applications/${prgname}.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=$pkgname
+Icon=$prgname
+Name=$prgname
+GenericName=pSX Emulator
+Comment=A PlayStation emulator
+Categories=Game;Emulator;
+EOF
+	echo "Icon: DONE"
+}
+icon_desktop
+
+}

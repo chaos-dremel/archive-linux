@@ -1,0 +1,13 @@
+pkgname=kdeadmin
+pkgver=4.11.0
+pkgbuild=1
+arch=noarch
+shortdesc=('KDE system administration tools')
+tags=('kde-misc virtual')
+
+adddep="kcron ksystemlog kuser"
+
+build() {
+	echo "Building virtual package"
+}
+

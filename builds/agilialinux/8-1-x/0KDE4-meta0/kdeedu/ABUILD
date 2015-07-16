@@ -1,0 +1,12 @@
+pkgname=kdeedu
+pkgver=4.10.2
+pkgbuild=1
+arch=noarch
+shortdesc=('Educational applications for KDE')
+tags=('kde-misc virtual')
+adddep=""
+
+build() {
+echo "Building virtual package"
+}
+

@@ -1,0 +1,71 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=kgmailnotifier
+pkgver=0.5.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="KGmailNotifier is a gmail notifier applet for KDE"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("http://opendesktop.org/content/show.php/KGmailNotifier?content=55375"
+)
+
+source=("http://opendesktop.org/CONTENT/content-files/55375-kgmailnotifier-0.5.1.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="kde4 kde-misc"     	#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver
+
+burn_patches
+
+rm -rf build 
+mkdir build && cd build || exit 1 
+cmake \
+-DCMAKE_C_FLAGS="$SLKCFLAGS" \
+-DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+-DCMAKE_INSTALL_PREFIX=`kde4-config --prefix` \
+-DCMALE_LIB_DIR=/usr/lib${SUFF} ../
+
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+
+cd ../
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

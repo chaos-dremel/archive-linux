@@ -1,0 +1,78 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=gloox
+pkgver=1.0
+pkgbuild=1
+arch=('auto')
+
+shortdesc="gloox, a portable high-level Jabber/XMPP library for C++"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("gloox is a rock-solid, full-featured Jabber/XMPP client library, written"
+	  "in clean ANSI C++. It makes writing spec-compliant clients easy and allows"
+	  "for hassle-free integration of Jabber/XMPP functionality into existing"
+	  "applications. gloox is released under the GNU GPL."
+""
+	  "Homepage: http://camaya.net/gloox/"
+)
+
+source=("http://camaya.net/download/${pkgname}-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="net-libs libs"     	#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= 
+                  
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

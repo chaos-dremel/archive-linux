@@ -1,0 +1,31 @@
+pkgname=udisks2
+pkgver=2.1.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Disk Management Service, version 2"
+
+source=("http://udisks.freedesktop.org/releases/udisks-${pkgver}.tar.bz2")
+
+tags="sys-fs base"
+
+build_deps="make gcc intltool perl pkg-config"
+
+adddep=""
+
+docs=
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"${SLKLDFLAGS}\" CFLAGS=\"${SLKCFLAGS}\" CXXFLAGS=\"${SLKCFLAGS}\" ./configure"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix="
+
+INSTALL_KEYS="DESTDIR=${pkgdir}"

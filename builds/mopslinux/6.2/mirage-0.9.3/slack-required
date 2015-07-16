@@ -1,0 +1,6 @@
+glibc-solibs >= 2.7-i486-17
+libX11 >= 1.1.5-i486-1
+libXau >= 1.0.4-i486-1
+libXdmcp >= 1.0.2-i486-1
+libxcb >= 1.1-i486-1
+python >= 2.5.2-i486-4

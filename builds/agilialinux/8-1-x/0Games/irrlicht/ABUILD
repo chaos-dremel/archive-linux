@@ -1,0 +1,151 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=irrlicht
+pkgver=1.8
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Irrlicht Engine - A free open source 3d engine"
+#longdesc=(""
+#)
+
+source=("http://downloads.sourceforge.net/project/irrlicht/Irrlicht%20SDK/${pkgver}/${pkgname}-${pkgver}.zip")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="dev-libs libs"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist="doc-html ex ex-m"
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs="./doc/*.txt"
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+cd source/Irrlicht
+sed -i "/^INSTALL_DIR/s:=.*:=$pkgdir/usr/lib${LIBDIRSUFFIX}:" \
+	./Makefile || exit 1
+
+  make NDEBUG=1 sharedlib || exit 1
+
+  make NDEBUG=1 || exit 1
+
+install -d \
+	$pkgdir/usr/lib${LIBDIRSUFFIX} \
+	${pkgdir}/usr/doc/${pkgname}-${pkgver}
+
+  make install || exit 1
+
+# Install static library and fix headers permissions
+#install -m644 lib/Linux/libIrrlicht.a $pkgdir/usr/lib${LIBDIRSUFFIX} || exit 1
+  chmod 644 $pkgdir/usr/include/$pkgname/* || exit 1
+
+cd $pkgdir/usr/lib${LIBDIRSUFFIX}
+ln -s libIrrlicht.so.$pkgver libIrrlicht.so.1 || exit 1
+}
+
+# documentation
+doc-html(){
+	pkgname="${p_pkgname}-doc"
+	arch=('noarch')
+	shortdesc="Documentation of the Irrlicht Engine"
+	adddep="${p_pkgname}"
+}
+doc-html_prep(){
+ cd $srcdir/$p_pkgname-$pkgver
+
+ # Install documentation
+
+ if [ ! -d ${pkgdir}/usr/doc/${p_pkgname}-${pkgver} ]; then
+  mkdir -p ${pkgdir}/usr/doc/${p_pkgname}-${pkgver}
+ fi
+
+ cp -r ./doc/html ${pkgdir}/usr/doc/${p_pkgname}-${pkgver} || exit 1
+
+ if [ -f ${p_pkgdir}/usr/doc/${p_pkgname}-${pkgver}/about.txt ]; then
+  cp -r readme.txt ${pkgdir}/usr/doc/${p_pkgname}-${pkgver}/ABOUT || exit 1
+ else
+  cp -r readme.txt ${pkgdir}/usr/doc/${p_pkgname}-${pkgver}/about.txt || exit 1
+ fi
+}
+
+# examples
+ex(){
+	pkgname="${p_pkgname}-examples"
+	pkgver="${p_pkgver}"
+	arch=('auto')
+	shortdesc="Examples and tutorials showing how to use the engine with C++"
+	adddep="${p_pkgname}==${p_pkgver} ${p_pkgname}-examples-media==${p_pkgver}"
+}
+ex_prep(){
+ go_src_dir
+ mkdir -p $pkgdir/usr/share/$p_pkgname/examples/bin
+
+ cd $p_pkgdir/usr/lib${LIBDIRSUFFIX} || exit 1
+
+  # Just a helper for examples compilation
+ ln -s libIrrlicht.so.$pkgver $srcdir/$p_pkgname-$pkgver/lib/Linux/libIrrlicht.so || exit 1
+
+  # Edit, build and install the examples
+ cd $srcdir/$p_pkgname-$pkgver/examples
+  sed -i '/define USE_IRRKLANG/s:.*://&:' ./Demo/CDemo.h
+  sed -i '/^CXXFLAGS/d' $(grep -Rl "^CXXFLAGS =" *)
+  make || exit 1
+ install -m755  ../bin/Linux/* /$pkgdir/usr/share/$p_pkgname/examples/bin/ 
+}
+
+# examples-media
+ex-m(){
+	pkgname="${p_pkgname}-examples-media"
+	arch=('noarch')
+	shortdesc="Graphics and sound resources for the demo applications and examples"
+	adddep="${p_pkgname}"
+}
+ex-m_prep(){
+ go_src_dir
+ mkdir -p $pkgdir/usr/share/$p_pkgname/
+  # Install media files for examples
+ cp -r media $pkgdir/usr/share/$p_pkgname
+}
+
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+
+#}

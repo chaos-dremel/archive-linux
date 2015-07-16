@@ -1,0 +1,7 @@
+glib2 >= 2.21.4-i686-1
+glibc-solibs >= 2.7-i486-17
+gpgme >= 1.1.6-i486-1
+libgpg-error >= 1.6-i486-3
+ncurses >= 5.6-i486-3
+openssl >= 0.9.8i-i486-3 | openssl-solibs >= 0.9.8i-i486-3
+pcre >= 7.9-i686-1uh

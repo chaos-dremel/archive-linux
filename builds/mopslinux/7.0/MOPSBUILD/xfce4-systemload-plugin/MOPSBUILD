@@ -1,0 +1,76 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=xfce4-systemload-plugin
+pkgver=0.4.2
+pkgbuild=1
+arch=('any')
+
+shortdesc="Systemload"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("A system load plugin for the Xfce4 desktop environment, written by"
+	  "Riccardo Persichetti. It displays the current CPU load, the memory in use,"
+	  "the swap space and the system uptime in the Xfce4 panel."
+	  "Homepage: http://goodies.xfce.org/"
+)
+
+source=("http://goodies.xfce.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="xfce xfce-extra"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= 
+                  
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

@@ -1,0 +1,27 @@
+pkgname=gnome-commander
+pkgver=1.2.8.15
+pkgbuild=1
+arch=('auto')
+
+shortdesc="a two-pane graphical file manager for the GNOME"
+
+source=("http://ftp.gnome.org/pub/GNOME/sources/${pkgname}/1.2/${pkgname}-${pkgver}.tar.xz")
+
+tags="app-misc xapps"
+
+build_deps="libgnome libgnomeui"
+
+BUILD_SYSTEM="autotools"
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--disable-scrollkeeper \
+--enable-python \
+--with-taglib \
+--with-libchm \
+--with-libgsf \
+--with-poppler"
+

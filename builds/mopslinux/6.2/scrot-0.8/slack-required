@@ -1,0 +1,10 @@
+freetype >= 2.3.9-i686-2
+giblib >= 1.2.4-i686-1
+glibc-solibs >= 2.7-i486-17
+imlib2 >= 1.4.2-i686-1nu
+libX11 >= 1.1.5-i486-1
+libXau >= 1.0.4-i486-1
+libXdmcp >= 1.0.2-i486-1
+libXext >= 1.0.4-i486-1
+libxcb >= 1.1-i486-1
+zlib >= 1.2.3-i486-2

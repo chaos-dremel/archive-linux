@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Fluxbox
+Comment=Highly configureable low resource X11 Window Manager
+Exec=/usr/bin/startfluxbox
+Terminal=False
+TryExec=/usr/bin/startfluxbox
+Type=Application
+

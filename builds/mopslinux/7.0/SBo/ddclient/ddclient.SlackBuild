@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# Slackware build script for ddclient
+# Written by Iskar Enev <iskar.enev[@]gmail.com>
+
+# Modified for MOPSLinux <www.mopslinux.org> by NK <nk-man@yandex.ru>
+
+PRGNAM=ddclient
+VERSION=3.8.0
+ARCH=${ARCH:-noarch}
+BUILD=${BUILD:-1}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/SBo}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-$CWD}
+
+set -e
+
+SRCNAM=$PRGNAM
+SRCVER=$VERSION
+ARC=${ARC:-tar.bz2}
+SRC=http://downloads.sourceforge.net/project/ddclient/ddclient/$SRCNAM-$SRCVER/$SRCNAM-$SRCVER.$ARC
+if [ ! -e $SRCNAM-$SRCVER.$ARC ]; then
+	wget -c $SRC
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+cd $TMP
+rm -rf $PRGNAM-$VERSION
+tar xvf $CWD/$PRGNAM-$VERSION.tar.bz2
+cd $PRGNAM-$VERSION
+chown -R root:root .
+chmod -R u+w,go+r-w,a-s .
+
+mkdir -p $PKG/usr/bin
+cp -a ddclient $PKG/usr/bin
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+chmod 644 sample*
+cp -a COPY* Change* README* RELEASENOTE TODO sample* $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+cat $CWD/doinst.sh > $PKG/install/doinst.sh
+
+mkdir -p $PKG/etc/rc.d
+cat $CWD/rc.ddclient.new > $PKG/etc/rc.d/rc.ddclient.new
+
+mkdir -p $PKG/etc/ddclient
+cat sample-etc_ddclient.conf > $PKG/etc/ddclient/ddclient.conf.new
+
+# Add the cache dir
+mkdir -p $PKG/var/cache/ddclient
+
+cd $CWD
+mkdir -p $PKG/usr/src/SlackBuilds
+tar Jcf $PKG/usr/src/SlackBuilds/${PRGNAM}.build_tree.tar.xz --ignore-failed-read \
+	patches/ $PRGNAM.SlackBuild slack-desc *.sh.gz *.sh *.desktop
+
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg-setmeta $PKG --keep-symlinks --name=${PACKAGE_NAME} \
+	--maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+	--version=${VERSION} --arch=${ARCH} --build ${BUILD} \
+	--add-tag=net-dns
+mpkg -P -G gendeps2 $PKG
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.t?z
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*

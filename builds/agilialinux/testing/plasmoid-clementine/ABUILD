@@ -1,0 +1,82 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=plasmoid-clementine
+pkgver=0.9
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="A KDE plasma app to show 'Now Playing' info from clementine"
+#longdesc=(""
+#)
+
+source=("http://kde-look.org/CONTENT/content-files/135581-clementine.alpha$pkgver.plasmoid")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="kde4 kde-misc"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+
+build()
+{
+go_src_dir
+burn_patches
+
+cd "$pkgdir"
+install -dm755 "usr/share/apps/plasma/plasmoids/${pkgname/plasmoid-/}"
+
+cp -Rv "${srcdir}/${pkgname/plasmoid-//}/"{contents,metadata.desktop} "usr/share/apps/plasma/plasmoids/${pkgname/plasmoid-/}"	
+install -Dm644 "${srcdir}/${pkgname/plasmoid-//}"/metadata.desktop "usr/share/kde4/services/plasma-applet-${pkgname/plasmoid-/}.desktop"
+
+find . -name .*~ -type f -exec rm {} \;
+
+#FILEC="usr/share/apps/plasma/plasmoids/simpleclock/contents/code/ClockWidget.qml"
+#[ ! -d ${pkgdir}/usr/doc/${pkgname}-${pkgver} ] && mkdir -p ${pkgdir}/usr/doc/${pkgname}-${pkgver}
+#sed \
+#	-e 's|*||' \
+#	-e 's|    ||' \
+#	-e '3,19!d' $FILEC > ${pkgdir}/usr/doc/${pkgname}-${pkgver}/Copyright
+}
+
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+#
+#}

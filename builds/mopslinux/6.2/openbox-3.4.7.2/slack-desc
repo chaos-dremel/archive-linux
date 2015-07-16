@@ -1,0 +1,35 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+       |-----handy-ruler------------------------------------------------------|
+openbox: быстрый, легкий и расширяемый оконный менеджер
+openbox: 
+openbox: Openbox делает более удобной работу с приложениями и рабочим столом. Э
+openbox: то достигается благодаря особому подходу к разработке, который в корне
+openbox:  отличается от разработки обычных оконных менеджеров. С самого начала 
+openbox: усилия разработчиков были направлены на обеспечение совместимости Open
+openbox: box с общепринятыми стандартами и стабильность. И только после этого в
+openbox: елась работа над визуальным интерфейсом.
+openbox: 
+openbox: Openbox является полнофункциональным и самостоятельным рабочим окружен
+openbox: ием, но может быть использован и в качестве оконного менеджера по умол
+openbox: чанию для рабочих сред KDE и GNOME.
+openbox: 
+openbox: Openbox 3 - это новый оконный менеджер полностью переписанный с нуля, 
+openbox: хотя его внешний вид и основан на Blackbox 0.65.0, исходный код которо
+openbox: го лежал в основе Openbox 2.
+openbox: 
+openbox: Некоторые особенности Openbox:
+openbox:  * совместимость с ICCCM и EWMH!
+openbox:  * высокая скорость работы
+openbox:  * привязка клавиатурных комбинаций
+openbox:  * настраиваемые действия мыши
+openbox:  * сопротивление окон
+openbox:  * поддержка нескольких мониторов через Xinerama!
+openbox:  * расширяемые меню
+openbox: 
+openbox: http://icculus.org/openbox/index.php/Main_Page

@@ -1,0 +1,77 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=ristretto
+pkgver=0.0.23
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Ristretto is an image-viewer for the Xfce Desktop Environment"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Ristretto - быстрый и легковесный просмотрщик изображений для рабочего окружения Xfce. http://goodies.xfce.org/projects/applications/ristretto"
+)
+
+source=("git:git://git.xfce.org/apps/ristretto")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="xfce media-gfx"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./autogen.sh"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= \
+--disable-debug \
+--docdir=/usr/doc/${pkgname}-${pkgver}"
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

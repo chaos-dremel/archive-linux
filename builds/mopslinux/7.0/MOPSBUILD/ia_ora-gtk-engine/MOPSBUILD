@@ -1,0 +1,81 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=ia_ora-gtk-engine
+prgname=ia_ora-gnome
+pkgver=1.0.22
+pkgbuild=2
+arch=('auto')
+
+shortdesc="Ia Ora, Mandriva GTK2 theme engine"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Ia Ora Mandriva GNOME theme. http://www.mandrivalinux.com/"
+)
+
+source=("http://fr.rpmfind.net/linux/Mandrake-devel/cooker/SRPMS/main/release/${prgname}-${pkgver}-2mdv2010.0.src.rpm")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="themes x11-themes"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+rpm2cpio $startdir/${prgname}-${pkgver}-2mdv2010.0.src.rpm \
+	$startdir/src/ | cpio -idmv
+tar xvf ${prgname}-${pkgver}.tar.?z* || exit 1
+cd $startdir/src/$prgname-$pkgver
+
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= 
+                  
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+find $startdir/pkg -name "metacity-1" -exec rm -rf {} \;
+}

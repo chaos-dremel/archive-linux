@@ -1,0 +1,80 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=icu4c
+pkgver=4.4
+pkgbuild=3
+arch=('auto')
+
+docs="license.html readme.html icu4c.css unicode-license.txt"
+
+shortdesc="International Components for Unicode"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("ICU, ICU4C & ICU4J Homepage: http://www.icu-project.org/"
+)
+
+srcver=$(echo $pkgver | tr . _)-src
+# gzipped tar archive for Unix and other platforms
+source=("http://download.icu-project.org/files/${pkgname}/${pkgver}/${pkgname}-${srcver}.tgz")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="dev-libs libs"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+cd $startdir/src/icu
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+
+burn_patches
+
+cd source/
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix=
+
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+
+cd ..
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

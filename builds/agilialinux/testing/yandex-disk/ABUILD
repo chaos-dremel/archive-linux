@@ -1,0 +1,98 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=yandex-disk
+pkgver=0.1.1.281
+pkgbuild=1
+
+shortdesc="Command line utility for Yandex.Disk"
+#longdesc=(""
+#)
+
+#arch=('auto')
+if [[ "`uname -m`" == "x86_64" ]]; then
+ arch="x86_64"
+ arch_d="amd64"
+else
+ arch="i386"
+ arch_d="$arch"
+fi
+
+if [[ "$ARCH" == "i686" ]]; then
+ deb_src="http://repo.yandex.ru/yandex-disk/deb/pool/main/y/yandex-disk/yandex-disk_${pkgver}_${arch_d}.deb"
+elif [[ "$ARCH" == "x86_64" ]]; then
+ deb_src="http://repo.yandex.ru/yandex-disk/deb/pool/main/y/yandex-disk/yandex-disk_${pkgver}_${arch_d}.deb"
+fi
+source=${deb_src}
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="network www-client"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+
+build()
+{
+go_src_dir
+burn_patches
+
+
+ar p $srcache/yandex-disk_${pkgver}_${arch_d}.deb data.tar.gz | tar zx -C ${pkgdir} || exit 1
+
+
+if [[ ! -d ${pkgdir}/usr/doc/${pkgname}-${pkgver} ]]; then
+ mkdir -p ${pkgdir}/usr/doc/${pkgname}-${pkgver}
+fi
+
+ar p $srcache/yandex-disk_${pkgver}_${arch_d}.deb control.tar.gz | tar zx || exit 1
+
+mv -v ${pkgdir}/usr/share/doc/yandex-disk/* ${pkgdir}/usr/doc/${pkgname}-${pkgver}
+rmdir ${pkgdir}/usr/share/doc/yandex-disk/ && rmdir -v ${pkgdir}/usr/share/doc/ || exit 1
+
+cat ./control > ${pkgdir}/usr/doc/${pkgname}-${pkgver}/about || exit 1
+rm -v ./control
+
+gunzip ${pkgdir}/usr/doc/${pkgname}-${pkgver}/changelog.gz || exit 1
+}
+
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+#
+#}

@@ -1,0 +1,91 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=dgen-sdl
+pkgver=1.23
+pkgbuild=2
+arch=('auto')
+
+shortdesc="Sega Genesis/MegaDrive Emulator"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("This is DGen/SDL, a semi-fantastic emulator for Unix-esque operating systems supported by the Simple DirectMedia Layer (SDL) library. It produces a virtual environment in which Sega Genesis (MegaDrive outside the US) games may run with fairly accurate audio and video."
+""
+"Homepage: http://tamentis.com/projects/dgen"
+)
+
+source=("http://tamentis.com/projects/dgen/files/${pkgname}-${pkgver}.tar.gz"
+"https://bugs.launchpad.net/ubuntu/+source/dgen/+bug/131281/+attachment/179175/+files/patches.tar.gz n"
+)
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="games-emulation console"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=""
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+
+
+go_src_dir
+
+# https://bugs.launchpad.net/ubuntu/+source/dgen/+bug/131281/comments/9
+tar xvf $srcache/patches.tar.?z*
+  patch -p1 < ./patches/fm-do-not-use-long.patch || exit 1
+  patch -p1 < ./patches/mz80-pbPC-pointer-subtract.patch || exit 1
+  patch -p1 < ./patches/mz80-stdint.patch || exit 1
+  patch -p1 < ./patches/mz80init.patch || exit 1
+  patch -p1 < ./patches/ras-emulate-pointer-wraparound.patch || exit 1
+  patch -p1 < ./patches/sdl-use-stdint.patch || exit 1
+}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix="
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

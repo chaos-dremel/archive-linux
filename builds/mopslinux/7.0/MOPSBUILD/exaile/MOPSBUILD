@@ -1,0 +1,74 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=exaile
+pkgver=0.3.1.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Exaile (Music Player for GTK+)"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Exaile is a music manager and player for GTK+ written in Python. It"
+	  "incorporates automatic fetching of album art, lyrics fetching, Last.fm"
+	  "scrobbling, support for many portable media players, internet radio such"
+	  "as shoutcast, and tabbed playlists."
+""
+"Homepage: http://exaile.org/"
+)
+
+source=("http://launchpad.net/exaile/0.3.1/0.3.1.1/+download/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="media-sound xapps"     	#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep="mutagen>=1.18 gst-python>=0.10.18 gst-plugins-good>=0.10.21 gstreamer>=0.10.28 dbus-python>=0.83.0 pygtk>=2.16.0 gst-plugins-ugly>=0.10.14 gst-ffmpeg>=0.10.10"
+
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+make -j${numjobs} || exit 1
+
+make PREFIX=/usr \
+LIBINSTALLDIR=/usr/lib${LIBDIRSUFFIX} \
+install DESTDIR=$startdir/pkg \
+|| exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

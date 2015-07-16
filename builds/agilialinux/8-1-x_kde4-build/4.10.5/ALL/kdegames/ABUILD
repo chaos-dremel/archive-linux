@@ -1,0 +1,53 @@
+pkgname=kdegames
+pkgver=4.10.4
+pkgbuild=1
+arch=noarch
+shortdesc=('A collection of games for the K Desktop Environment')
+tags=('kde-misc virtual')
+
+adddep="libkdegames \
+	libkmahjongg \
+	klickety \
+	ksudoku \
+	ksquares \
+	kpat \
+	klines \
+	ksnakeduel \
+	kollision \
+	kshisen \
+	kblocks \
+	lskat \
+	kreversi \
+	bovo \
+	kajongg \
+	granatier \
+	kmines \
+	kiriki \
+	kigo \
+	bomber \
+	kolf \
+	kdiamond \
+	kbounce \
+	konquest \
+	kapman \
+	knavalbattle \
+	killbots \
+	kubrick \
+	kgoldrunner \
+	knetwalk \
+	kbreakout \
+	ksirk \
+	kfourinline \
+	picmi \
+	kblackbox \
+	palapeli \
+	katomic \
+	ktuberling \
+	kjumpingcube \
+	kmahjongg \
+	kspaceduel"
+
+build() {
+	echo "Building virtual package"
+}
+

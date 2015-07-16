@@ -1,0 +1,100 @@
+#!/bin/sh
+
+# Slackware build script for locale-gettext perl module
+
+# Copyright 2006-2008  Robby Workman, Northport, Alabama, USA
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Modified for MOPSLinux <www.mopslinux.org> by NK <nk-man@yandex.ru>
+
+PRGNAM=locale-gettext
+VERSION=1.05
+ARCH=${ARCH:-i686}
+BUILD=${BUILD:-1}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/SBo}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-$CWD}
+
+SRCNAM=gettext
+SRCVER=$VERSION
+ARC=${ARC:-tar.gz}
+SRC=http://search.cpan.org/CPAN/authors/id/P/PV/PVANDRY/$SRCNAM-$SRCVER.$ARC
+if [ ! -e $SRCNAM-$SRCVER.$ARC ]; then
+	wget -c $SRC
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+cd $TMP || exit 1
+rm -rf gettext-$VERSION
+tar xvf $CWD/gettext-$VERSION.tar.gz || exit 1
+cd gettext-$VERSION || exit 1
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+perl Makefile.PL PREFIX=/usr || exit 1
+make || exit 1
+make pure_vendor_install DESTDIR=$PKG || exit 1
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a README $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mv $PKG/usr/share/man $PKG/usr/man
+( cd $PKG/usr/man
+  find . -type f -exec gzip -9 {} \;
+  for i in $(find . -type l) ; do ln -s $(readlink $i).gz $i.gz ; rm $i ; done
+)
+rm -rf $PKG/usr/share
+( cd $PKG
+  # Remove 'special' files
+  find . -name perllocal.pod \
+  -o -name "\.packlist" \
+  -o -name "*.bs" \
+  | xargs rm -f
+)
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+
+echo "MPKG"
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg convert $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg -P gendeps2 $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg-setmeta $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz \
+  --maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+  --add-tag=games --add-tag=xapps
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz
+echo "Package Complete"
+
+cd $CWD
+tar vczf $PACKAGE_NAME-$VERSION-$BUILD.tar.gz slack-desc $PRGNAM.SlackBuild
+
+#echo "delete build garbage"
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*
+
+echo "DONE"

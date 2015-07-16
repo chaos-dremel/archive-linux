@@ -1,0 +1,31 @@
+pkgname=geany
+pkgver=1.24
+pkgbuild=1
+arch=('auto')
+
+shortdesc="A fast, light, GTK+ IDE"
+
+#source=("http://download.geany.org/${pkgname}-${pkgver}.tar.bz2")
+source=("git:https://github.com/geany/geany.git")
+
+tags="xapps dev-util"
+
+build_deps="perl-xml-parser"
+
+BUILD_SYSTEM="autotools"
+
+if [[ -z "`echo $source | grep git`" ]]; then
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+else
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./autogen.sh"
+fi
+
+BUILD_KEYS="--prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libdir=/usr/lib${LIBDIRSUFFIX} \
+    --disable-static \
+    --mandir=/usr/man \
+    --docdir=/usr/doc/${pkgname}-${pkgver}"
+
+INSTALL_KEYS="DESTDIR=$pkgdir"

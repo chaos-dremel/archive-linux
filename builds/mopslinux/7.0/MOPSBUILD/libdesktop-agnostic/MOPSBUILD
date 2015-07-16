@@ -1,0 +1,72 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=libdesktop-agnostic
+pkgver=0.3.90
+pkgbuild=2
+arch=('auto')
+
+shortdesc="Desktop Agnostic Library"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("This library provides an extensible configuration API, a unified virtual"
+	  "file system API, and a desktop item editor (all with pluggable backends)"
+	  "for GLib-based projects. It is not tied to any one desktop environment,"
+	  "although there are desktop-specific modules."
+""
+	  "Homepage: https://launchpad.net/libdesktop-agnostic"
+)
+
+source=("http://launchpad.net/libdesktop-agnostic/0.4/$pkgver/+download/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="libs x11-libs"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver
+
+#burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./waf configure \
+	--prefix=/usr \
+	--config-backends=keyfile --vfs-backends=gio --desktop-entry-backends=glib
+./waf
+./waf install --destdir=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

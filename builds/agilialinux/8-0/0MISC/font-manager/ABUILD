@@ -1,0 +1,74 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=font-manager
+pkgver=0.5.4
+pkgbuild=1
+arch=('auto')
+
+shortdesc="A font management application for the GNOME desktop"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Font Manager is not intended to be a professional-grade font management"
+	  "solution, but rather a simple application suitable for the needs of most"
+	  "desktop users, and even some graphics designers who may need to manage"
+	  "just a few thousand font files."
+""
+	  "Although designed with the GNOME desktop environment in mind, it should" 
+	  "work well with most major desktop environments such as Xfce," 
+	  "Enlightenment, and even KDE."
+""
+	  "Homepage: http://code.google.com/p/font-manager/"
+)
+
+source=("http://font-manager.googlecode.com/files/${pkgname}-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+
+tags="x11-misc xapps"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+docs=				#additional files should be copied into /usr/docs/${pkgname} dir from sources
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix="
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

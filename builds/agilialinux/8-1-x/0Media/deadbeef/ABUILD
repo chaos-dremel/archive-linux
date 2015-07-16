@@ -1,0 +1,33 @@
+pkgname=deadbeef
+pkgver=0.6.0
+pkgbuild=1
+arch=('auto')
+
+shortdesc="DeaDBeeF - Ultimate Music Player For GNU/Linux"
+
+source=("http://downloads.sourceforge.net/project/deadbeef/${pkgname}-${pkgver}.tar.bz2")
+
+tags="media-sound xapps"
+
+build_deps="perl-xml-parser yasm"
+
+BUILD_SYSTEM="autotools"
+ 
+BUILD_KEYS="--prefix=/usr \
+	--sysconfdir=/etc \
+	--localstatedir=/var \
+	--libdir=/usr/lib${LIBDIRSUFFIX} \
+	--disable-static \
+	--mandir=/usr/man \
+	--docdir=/usr/doc/${pkgname}-${pkgver} \
+	--enable-notify \
+	--enable-mms \
+	--enable-wildmidi \
+	--enable-converter \
+	--enable-ffap \
+	--disable-pulse \
+	--disable-gtk3 \
+	--disable-portable \
+	--disable-ffmpeg"
+ 
+INSTALL_KEYS="DESTDIR=$pkgdir"

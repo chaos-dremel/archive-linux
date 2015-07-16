@@ -1,0 +1,26 @@
+pkgname=oxygen-gtk
+pkgver=1.4.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Oxygen-Gtk is a port of the default KDE widget theme (Oxygen), to gtk"
+
+source="http://kde.mirrors.tds.net/pub/kde/stable/${pkgname}2/$pkgver/src/${pkgname}2-$pkgver.tar.bz2"
+# Uncomment to build from git
+# source=("git:git://git.kde.org/oxygen-gtk")
+
+tags="x11-themes themes"
+
+before_build(){
+# w/o icons
+go_src_dir
+sed -i "s/OXYGEN_ICON_HACK 1/OXYGEN_ICON_HACK 0/g" CMakeLists.txt 
+}
+
+BUILD_SYSTEM="cmake"
+BUILD_KEYS="-DCMAKE_INSTALL_PREFIX=/usr \
+-DCMAKE_BUILD_TYPE=RELEASE \
+-DLIB_DIR=lib${LIBDIRSUFFIX} \
+-DLIB_SUFFIX=${LIBDIRSUFFIX} \
+-DOXYGEN_ICON_HACK=0 \
+../"

@@ -1,0 +1,80 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=cpuburn
+pkgver=1.4a
+pkgbuild=1
+arch=('auto')
+
+shortdesc="CPU testing utilities in optimized assembler for maximum loading of CPUs"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("CPU testing utilities in optimized assembler for maximum loading P6 (Intel Pentium Pro/II/III and Celeron TM), AMD K7 (Athlon/Duron/Thunderbird TM) AMD K6, and Intel P5 Pentium chips. WARNING! This program is designed to heavily load CPU chips. Undercooled, overclocked or otherwise weak systems may fail causing data loss (filesystem corruption) and possibly permanent damage to electronic components. Nor will it catch all flaws. *** USE AT YOUR OWN RISK *** This is free software, copyright but freely licenced under the GNU Public Licence copyleft. Homepage: http://pages.sbcglobal.net/redelm"
+)
+
+#source=("http://pages.sbcglobal.net/redelm/cpuburn_1_4a_tar.gz")
+source=("http://mirror.yandex.ru/gentoo-distfiles/distfiles/cpuburn_1_4a_tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="app-benchmarks utils" # console
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs="Design"
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+#before_build()
+#{
+#echo ""
+#}
+
+build()
+{
+go_src_dir
+
+# a patch from debian/ubuntu patchset / thx Arch
+burn_patches
+
+make || exit 1
+
+  install -Dm755 burnBX $pkgdir/usr/bin/burnBX
+  install -Dm755 burnK6 $pkgdir/usr/bin/burnK6
+  install -Dm755 burnK7 $pkgdir/usr/bin/burnK7
+  install -Dm755 burnMMX $pkgdir/usr/bin/burnMMX
+  install -Dm755 burnP5 $pkgdir/usr/bin/burnP5
+  install -Dm755 burnP6 $pkgdir/usr/bin/burnP6
+
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

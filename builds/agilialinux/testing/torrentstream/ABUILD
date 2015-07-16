@@ -1,0 +1,105 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=torrentstream
+pkgver=2.0.0
+
+pkgbuild=1
+shortdesc="engine and multimedia player based on VLC"
+#longdesc=(""
+#)
+
+
+if [[ "`uname -m`" == "x86_64" ]]; then
+ arch="x86_64"
+ arch_d="amd64"
+else
+ arch="i386"
+ arch_d="$arch"
+fi
+
+deb_p="acestream-local_${pkgver}_${arch_d}.deb"
+source=("http://torrentstream.org/downloads/linux/test/${deb_p} n")
+
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="xapps media-video"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+
+# deb
+ar p $srcache/$deb_p data.tar.gz | tar zx -C ${pkgdir} || exit 1
+
+a_dist(){
+# lib64
+if [ -d ${pkgdir}/usr/lib ]; then
+ mv ${pkgdir}/usr/lib ${pkgdir}/usr/lib${LIBDIRSUFFIX} || exit 1
+fi
+
+# py-dist
+mv ${pkgdir}/usr/lib${LIBDIRSUFFIX}/python2.7/dist-packages/ \
+	${pkgdir}/usr/lib${LIBDIRSUFFIX}/python2.7/site-packages/ || exit 1
+
+# py-v
+mv ${pkgdir}/usr/lib${LIBDIRSUFFIX}/python2.7 ${pkgdir}/usr/lib${LIBDIRSUFFIX}/python2.6 || exit 1
+
+# mozilla
+mv ${pkgdir}/usr/lib${LIBDIRSUFFIX}/xulrunner-addons/ ${pkgdir}/usr/lib${LIBDIRSUFFIX}/xulrunner || exit 1
+}
+
+a_dist
+
+# doc
+ar p $srcache/$deb_p control.tar.gz | tar zx || exit 1
+mkdir -p ${pkgdir}/usr/doc/${pkgname}-${pkgver}/
+cat ./control > ${pkgdir}/usr/doc/${pkgname}-${pkgver}/about || exit 1
+
+}
+
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+
+#}

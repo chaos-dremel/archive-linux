@@ -1,0 +1,90 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=ConsoleKit-old
+pkgver=0.4.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="A framework for defining and tracking users, login sessions, and seats"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("ConsoleKit is a framework for keeping track of the various users, sessions, and seats present on a system. It provides a mechanism for software to react to changes of any of these items or of any of the metadata associated with them."
+)
+
+source=("http://www.freedesktop.org/software/ConsoleKit/dist/ConsoleKit-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="libs sys-auth"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides="ConsoleKit"
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= \
+	--bindir=/usr/bin \
+--sbindir=/usr/sbin \
+--includedir=/usr/include \
+--infodir=/usr/info \
+--libexecdir=/usr/lib${LIBDIRSUFFIX}/ConsoleKit \
+--enable-pam-module \
+--with-pam-module-dir=/lib${LIBDIRSUFFIX}/security \
+--enable-docbook-docs \
+--docdir=/usr/doc/${pkgname}-${pkgver}"
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+install -m755 ${filedir}/pam-foreground-compat.ck \
+	${pkgdir}/usr/lib${LIBDIRSUFFIX}/ConsoleKit/run-session.d/ || exit 1
+
+  # install the logrotate config
+  install -D -m644 ${filedir}/consolekit.logrotate ${pkgdir}/etc/logrotate.d/consolekit || exit 1
+}

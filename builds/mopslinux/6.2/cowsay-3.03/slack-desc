@@ -1,0 +1,17 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+      |-----handy-ruler------------------------------------------------------|
+cowsay: настраиваемая говорящая корова
+cowsay: 
+cowsay: Cowsay (или cowthink) показывает текст, как реплику (или мысли) весело
+cowsay: й ASCII коровы. Если вам не нравятся коровы, то использовав ASCII рисо
+cowsay: вание вы сможете заменить их на каких-нибудь других существ (Tux'ов, B
+cowsay: SD демонов, драконов и множество животных, от индюка до слона в змее).
+cowsay:  
+cowsay: 
+cowsay: http://www.nog.net/~tony/warez/cowsay.shtml

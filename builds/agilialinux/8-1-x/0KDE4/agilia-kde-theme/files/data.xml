@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<name>
+		agilia-kde-theme
+	</name>
+	<version>
+		1.0
+	</version>
+	<arch>
+		noarch
+	</arch>
+	<build>
+		1
+	</build>
+	<conflicts>
+		ktheme4
+	</conflicts>
+	<short_description>
+		Default settings for KDE environment
+	</short_description>
+	<description>
+		Default settings for KDE environment. For now, it contains only GTK settings.
+	</description>
+	<dependencies>
+		<dep>
+			<name>
+				prudence-theme
+			</name>
+			<condition>
+				any
+			</condition>
+			<version>
+			</version>
+		</dep>
+		<dep>
+			<name>
+				prudence-icon-theme
+			</name>
+			<condition>
+				any
+			</condition>
+			<version>
+			</version>
+		</dep>
+	</dependencies>
+	<suggests/>
+	<maintainer>
+		<name>
+			aix27249
+		</name>
+		<email>
+			i27249@gmail.com
+		</email>
+	</maintainer>
+	<tags>
+		<tag>
+			themes
+		</tag>
+		<tag>
+			x11-themes
+		</tag>
+	</tags>
+</package>

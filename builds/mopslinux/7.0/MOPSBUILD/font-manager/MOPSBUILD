@@ -1,0 +1,82 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=font-manager
+pkgver=0.4.4
+pkgbuild=1
+arch=('auto')
+
+shortdesc="A font management application for the GNOME desktop"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Font Manager is not intended to be a professional-grade font management"
+	  "solution, but rather a simple application suitable for the needs of most"
+	  "desktop users, and even some graphics designers who may need to manage"
+	  "just a few thousand font files."
+""
+	  "Although designed with the GNOME desktop environment in mind, it should" 
+	  "work well with most major desktop environments such as Xfce," 
+	  "Enlightenment, and even KDE."
+""
+	  "Homepage: http://code.google.com/p/font-manager/"
+)
+
+source=("http://font-manager.googlecode.com/files/${pkgname}-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="x11-misc xapps"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= 
+                  
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

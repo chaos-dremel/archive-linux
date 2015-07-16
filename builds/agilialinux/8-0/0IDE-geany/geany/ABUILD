@@ -1,0 +1,74 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=geany
+pkgver=0.20
+pkgbuild=1
+arch=('auto')
+
+shortdesc="A fast, light, GTK+ IDE"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Geany is a small and lightweight Integrated Development Environment. It"
+	  "was developed to provide a small and fast IDE, which has only a few"
+	  "dependencies from other packages. Another goal was to be as independent as"
+	  "possible from a special Desktop Environment like KDE or GNOME - Geany only"
+	  "requires the GTK2 runtime libraries. The code is licensed under the terms"
+	  "of the GNU General Public Licence."
+""
+"Homepage: http://www.geany.org"
+)
+
+source=("http://download.geany.org/${pkgname}-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+
+tags="xapps dev-util"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+docs=				#additional files should be copied into /usr/docs/${pkgname} dir from sources
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" \
+	./configure" # --help"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= \
+--docdir=/usr/doc/${pkgname}-${pkgver}"
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

@@ -1,0 +1,98 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=gens
+pkgver=2.15.5
+pkgbuild=2
+arch=('auto')
+
+shortdesc="a Sega Genesis / Sega CD / Sega 32X emulator"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("This is a Linux port (x86 processors) based on the Sega Genesis Emulator"
+	  ""Gens". It emulates Genesis, Sega CD (iso/mp3, not real CD) and 32X roms."
+	  ""
+	  "Homepage: http://sourceforge.net/projects/gens"
+)
+
+source=("http://downloads.sourceforge.net/project/gens/Gens%20Source%20Code/Gens%20${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="games-emulation games"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+
+icon_desktop ()
+	{
+	echo "Gens Icon"
+mkdir -p $pkgdir/usr/share/applications || exit 1
+cat << EOF > $pkgdir/usr/share/applications/gens.desktop
+[Desktop Entry]
+Name=Gens
+Comment=Sega Genesis Emulator
+GenericName=Sega Genesis Emulator
+Exec=gens
+Icon=/usr/share/gens/gens_small.png
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=Game;Emulator;
+EOF
+	}
+icon_desktop
+
+}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix="
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

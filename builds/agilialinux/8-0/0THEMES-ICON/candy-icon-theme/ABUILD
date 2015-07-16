@@ -1,0 +1,73 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=candy-icon-theme
+pkgver=1.0_beta
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="Candy Icon Theme"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("http://gnome-look.org/content/show.php/Candy+Icon+Theme?content=126012"
+)
+
+# https://launchpad.net/candyicons
+source=("http://launchpad.net/candyicons/1.x/1.0-beta/+download/candy_icon_theme_1.0beta.tar.gz")
+#wgetopts="--user-agent='wget'"
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="x11-themes themes"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs="" #README AUTHORS COPYING ChangeLog"
+
+gendeps_blacklist=usr/share/icons/*
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+cd $srcdir
+
+mkdir -p $pkgdir/usr/share/icons/
+cp -r Candy/ $pkgdir/usr/share/icons/ || exit 1
+rm -rv $pkgdir/usr/share/icons/Candy/{AUTHORS,COPYING} 
+}

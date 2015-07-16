@@ -1,0 +1,103 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=midori
+pkgver=0.3.0
+pkgbuild=1
+arch=('auto')
+
+shortdesc="A lightweight, portable GTK+ web browser"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Midori is a lightweight and portable web browser based on Gtk+. The interface is designed to be intuitive yet powerful. Homepage: http://www.twotoasts.de/index.php?/pages/midori_summary.html"
+)
+
+source=("git:git://git.xfce.org/apps/midori")
+#source=("http://archive.xfce.org/src/apps/midori/0.2/${pkgname}-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="www-client xapps"
+
+#dependencies only needed to build package
+build_deps="vala docutils>=0.7"
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+
+#./waf configure --help && exit 0
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./waf configure --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--mandir=/usr/man \
+--docdir=/usr/doc/$pkgname-$pkgver \
+--enable-nls \
+--update-po \
+--enable-docs \
+--enable-userdocs \
+--enable-apidocs \
+--enable-unique \
+--enable-vala \
+--enable-libidn \
+--enable-libnotify \
+--enable-addons \
+--disable-hildon
+
+#--enable-tests \
+#--enable-sqlite \
+
+./waf build
+./waf install --destdir=$pkgdir || exit 1
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+# 2.9.0
+#cd $pkgdir/usr/doc/midori-${pkgver}; mkdir -p ./midori
+#mv ./user $pkgdir/usr/doc/midori-${pkgver}/midori || exit 1
+#
+
+mv $pkgdir/etc/xdg/midori/search $pkgdir/etc/xdg/midori/search.new
+mv $pkgdir/etc/xdg/midori/extensions/libadblock.so/config \
+	$pkgdir/etc/xdg/midori/extensions/libadblock.so/config.new
+}

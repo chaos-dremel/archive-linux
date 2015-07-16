@@ -1,0 +1,70 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=QtCurve-KDE4-qt
+pkgver=1.8.6
+pkgbuild=1
+arch=('auto')
+
+shortdesc="a pure Qt4 style without KDE4 dependencies"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("http://kde-look.org/content/show.php?content=40492"
+)
+
+source=("http://craigd.wikispaces.com/file/view/QtCurve-KDE4-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="themes x11-themes"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides="QtCurve-KDE4"
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs= #"AUTHORS ChangeLog COPYING README TODO"
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="cmake"
+BUILD_KEYS="-DCMAKE_INSTALL_PREFIX=/usr \
+-DCMAKE_BUILD_TYPE=RELEASE \
+-DLIB_DIR=lib${LIBDIRSUFFIX} \
+-DLIB_SUFFIX=${LIBDIRSUFFIX} \
+-DQTC_QT_ONLY=true ../"
+
+#     -DQTC_QT_ONLY=true
+#        Build style as a pure Qt4 style.
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

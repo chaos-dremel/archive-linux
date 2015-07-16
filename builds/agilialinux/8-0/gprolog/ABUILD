@@ -1,0 +1,109 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=gprolog
+pkgver=1.3.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="A Native Prolog Compiler with Constraint Solving over Finite Domains"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("GNU Prolog is a free Prolog compiler with constraint solving over finite domains developed by Daniel Diaz. http://www.gprolog.org/"
+)
+
+source=("http://www.gprolog.org/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="develop dev-lang"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+
+cd src
+
+# http://blog.gmane.org/gmane.comp.gnu.prolog.bugs/month=20040601
+# ./configure --with-c-flags=-O
+#    (There is problem when compiling with -O2 or -O3)
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+	./configure  --with-c-flags=-O \
+	--prefix=/usr \
+	--sysconfdir=/etc \
+	--localstatedir=/var \
+	--libdir=/usr/lib${LIBDIRSUFFIX} \
+	--disable-static \
+	--mandir=/usr/man \
+	--program-prefix= \
+	--program-suffix= \
+	|| exit 1
+
+make -j2 || make || exit 1
+
+make install \
+        INSTALL_DIR="$pkgdir"/usr/share/gprolog \
+        LINKS_DIR="$pkgdir"/usr/bin \
+        DOC_DIR="$pkgdir"/usr/${pkgname}-${pkgver}/doc \
+        HTML_DIR="$pkgdir"/usr/${pkgname}-${pkgver}/doc/HTML \
+        EXAMPLES_DIR="$pkgdir"/usr/share/gprolog \
+        sysconfdir="$pkgdir"/etc \
+        localstatedir="$pkgdir"/var || exit 1
+#DESTDIR=$pkgdir
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+   cd "$pkgdir"/usr/bin
+   rm *
+   ln -s /usr/share/gprolog/bin/fd2c && \
+   ln -s /usr/share/gprolog/bin/gplc && \
+   ln -s /usr/share/gprolog/bin/gprolog && \
+   ln -s /usr/share/gprolog/bin/hexgplc && \
+   ln -s /usr/share/gprolog/bin/ma2asm && \
+   ln -s /usr/share/gprolog/bin/pl2wam && \
+   ln -s /usr/share/gprolog/bin/wam2ma || exit 1
+}

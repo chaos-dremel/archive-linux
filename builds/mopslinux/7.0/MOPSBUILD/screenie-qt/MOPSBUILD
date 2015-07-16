@@ -1,0 +1,80 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=screenie-qt
+prgname=screenie
+pkgver=0.0
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Screenie (Fancy screenshot composer)"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Screenie a small tool to allow you to compose a fancy and stylish"
+	  "screenshots. It is cross-platform (for Linux, Windows and Mac OS X) and"
+	  "very easy to use. You will have an impressive screenshot in just one"
+	  "minute!"
+""
+"Homepage: http://code.google.com/p/screenie/"
+)
+
+source=("git:git://github.com/ariya/screenie.git")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="media-gfx xapps"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+qmake
+make -j${numjobs} || exit 1
+
+mkdir -p $startdir/pkg/usr/{bin,share/{pixmaps,applications}} || exit 1
+
+cp -a $prgname $startdir/pkg/usr/bin/$pkgname
+
+sed -i 's|Icon=screenie|Icon=screenie-qt|' ${prgname}.desktop || exit 1
+sed -i 's|Exec=/usr/bin/screenie|Exec=/usr/bin/screenie-qt|' ${prgname}.desktop || exit 1
+
+cp -a resources/$prgname.png $startdir/pkg/usr/share/pixmaps/$pkgname.png
+cp -a $prgname.desktop $startdir/pkg/usr/share/applications/$pkgname.desktop
+
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

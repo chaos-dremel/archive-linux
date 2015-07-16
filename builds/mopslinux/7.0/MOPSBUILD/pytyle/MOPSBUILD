@@ -1,0 +1,65 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=pytyle
+pkgver=0.7.4
+pkgbuild=1
+arch=('auto')
+
+shortdesc="PyTyle, a manual tiling manager"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("PyTyle is a manual tiling manager that can slide into any EWMH compliant"
+	  "window manager, inspired by XMonad. It will allow you to enable/disable"
+	  "tiling on a per screen per workspace basis, and continually tile your"
+	  "windows. "
+""
+"Homepage: http://pytyle.com/wiki/Main_Page"
+)
+
+source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="utils x11-utils"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver
+
+burn_patches
+
+python setup.py install --root=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

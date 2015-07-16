@@ -1,0 +1,79 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=tennix
+pkgver=1.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Tennis game"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Tennix is a top-view 2D tennis game. It features a two-player game mode and a single-player mode against the computer. This is the SDL port of a DOS game written in 2003. The  original  game can still be found on the web at http://thp.io/2003/tennix/ . Tennix is released under the terms of the GNU GPL Version 2. Homepage: http://icculus.org/tennix"
+)
+
+source=("http://icculus.org/tennix/downloads/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="games games-sports"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+#before_build()
+#{
+#echo ""
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+# make PREFIX=/usr DATADIR=/usr/share || exit 1
+# make PREFIX=/usr DATADIR=/usr/share DESTDIR=${pkgdir} install || exit 1
+
+make PREFIX=/usr || exit 1
+make PREFIX=/usr DESTDIR=${pkgdir} install || exit 1
+
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+if [ -d ${pkgdir}/usr/doc/${pkgname}-${pkgver}/doc ]; then
+ rm -rfv ${pkgdir}/usr/doc/${pkgname}-${pkgver}/doc
+fi
+
+}

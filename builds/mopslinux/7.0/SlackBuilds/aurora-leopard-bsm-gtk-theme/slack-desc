@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+   
+                            |-----handy-ruler------------------------------------------------------|
+aurora-leopard-bsm-gtk-theme: Aurora Leopard BSM (GTK 2.x Theme/Style)
+aurora-leopard-bsm-gtk-theme:
+aurora-leopard-bsm-gtk-theme: Aurora Leopard BSM is released! The package include 3 themes: 
+aurora-leopard-bsm-gtk-theme: Classic, Light and Dark. The theme needs Aurora Engine.
+aurora-leopard-bsm-gtk-theme: License: GPL.
+aurora-leopard-bsm-gtk-theme: 
+aurora-leopard-bsm-gtk-theme: http://gnome-look.org/
+aurora-leopard-bsm-gtk-theme:
+aurora-leopard-bsm-gtk-theme:
+aurora-leopard-bsm-gtk-theme:
+aurora-leopard-bsm-gtk-theme:

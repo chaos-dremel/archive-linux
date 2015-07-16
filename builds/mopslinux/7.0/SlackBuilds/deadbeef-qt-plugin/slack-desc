@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+                  |-----handy-ruler------------------------------------------------------|
+deadbeef-qt-plugin: DeaDBeeF QtGui plugin
+deadbeef-qt-plugin: 
+deadbeef-qt-plugin: Qt based user interface plugin for DeaDBeeF music player.
+deadbeef-qt-plugin: 
+deadbeef-qt-plugin: Homepage: http://bitbucket.org/tonn/qtgui/wiki/Home
+deadbeef-qt-plugin:
+deadbeef-qt-plugin: Warning! After install you need to disable default DeaDBeeF ui plugin.
+deadbeef-qt-plugin: Add next string to ~/.config/deadbeef/config file:
+deadbeef-qt-plugin: blacklist_plugins gtkui
+deadbeef-qt-plugin:
+deadbeef-qt-plugin:

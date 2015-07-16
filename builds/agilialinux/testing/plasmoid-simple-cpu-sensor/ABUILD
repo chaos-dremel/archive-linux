@@ -1,0 +1,83 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=plasmoid-simple-cpu-sensor
+pkgver=0.5
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Simple CPU monitoring plasmoid for KDE 4"
+
+#source=("git:https://github.com/alex-oleshkevich/simple-cpu-sensor.git")
+source="http://kde-look.org/CONTENT/content-files/135310-simple-cpu-sensor.zip"
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="kde4 kde-misc"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep="kdebase-workspace"
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+build(){
+go_src_dir
+cd ..
+
+#install -d "${pkgdir}"/usr/share/apps/plasma/plasmoids/simple-cpu-sensor/contents/{code,ui}
+
+  #install -m644 metadata.desktop \
+  # "${pkgdir}"/usr/share/apps/plasma/plasmoids/simple-cpu-sensor/
+
+  #install -m644 contents/code/{config,configwindow,main,util}.py \
+  #install -m644 contents/code/{config,configwindow,main}.py \
+  #  "${pkgdir}"/usr/share/apps/plasma/plasmoids/simple-cpu-sensor/contents/code/
+
+  #install -m644 contents/ui/configwindow.ui \
+  #  "${pkgdir}"/usr/share/apps/plasma/plasmoids/simple-cpu-sensor/contents/ui/
+
+  #install -Dm644 metadata.desktop \
+  #  "${pkgdir}"/usr/share/kde4/services/plasma-applet-simple-cpu-sensor.desktop 
+
+
+install -d "${pkgdir}"/usr/share/apps/plasma/plasmoids/simple-cpu-sensor/contents/code
+install -m644 metadata.desktop "${pkgdir}"/usr/share/apps/plasma/plasmoids/simple-cpu-sensor/
+install -m644 contents/code/main.py "${pkgdir}"/usr/share/apps/plasma/plasmoids/simple-cpu-sensor/contents/code/
+}
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+
+#}

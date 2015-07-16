@@ -1,0 +1,120 @@
+#!/bin/sh
+
+# Slackware build script for phpSysInfo
+
+# Copyright 2010 NK <nk-man@yandex.ru>
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+PRGNAM=phpsysinfo
+VERSION=2.5.4
+ARCH=${ARCH:-noarch}
+BUILD=${BUILD:-2}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+fi
+
+set -e
+
+SRCVER=$VERSION
+ARC=${ARC:-tar.gz}
+SRC=http://downloads.sourceforge.net/project/phpsysinfo/phpsysinfo/$VERSION/$PRGNAM-$SRCVER.$ARC
+if [ ! -e $PRGNAM-$SRCVER.$ARC ]; then
+	wget -c $SRC
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+cd $TMP
+rm -rf $PRGNAM
+tar xvf $CWD/$PRGNAM-$SRCVER.tar.?z* || exit 1
+cd $PRGNAM
+
+patch config.php.new < $CWD/patches/config.php.new.diff
+patch distros.ini < $CWD/patches/distros.ini.diff
+
+## MOPSLogo
+# cd $CWD
+# wget -c http://www.mopslinux.org/favicon.ico
+# convert favicon.ico MOPSLinux.png
+cp $CWD/*.png .
+
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+#find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+#  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+if [ -d $PKG/usr/man ]; then
+	gzip -9 $PKG/usr/man/man?/*.? 
+fi
+
+if [ -d $PKG/usr/share/man ]; then
+	gzip -9 $PKG/usr/share/man/man?/*.?
+fi
+
+if [ ! -d $PKG/usr/doc/$PRGNAM-$VERSION ]; then
+	mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+fi
+mv COPYING ChangeLog README $PKG/usr/doc/$PRGNAM-$VERSION
+#cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+chmod 644 $PKG/usr/doc/$PRGNAM-$VERSION/*
+
+mkdir -p $PKG/var/www/htdocs/$PRGNAM/images
+mv *.png $PKG/var/www/htdocs/$PRGNAM/images
+cp -a * $PKG/var/www/htdocs/$PRGNAM
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+cat $CWD/doinst.sh > $PKG/install/doinst.sh
+
+# MPKG
+cd $CWD
+mkdir -p $PKG/usr/src/SlackBuilds
+tar Jcf $PKG/usr/src/SlackBuilds/${PRGNAM}.build_tree.tar.xz --ignore-failed-read \
+	$PRGNAM.SlackBuild slack-desc *.sh.gz *.sh *.desktop *.png patches/
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg-setmeta $PKG --keep-symlinks --name=${PACKAGE_NAME} \
+	--maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+	--version=${VERSION} --arch=${ARCH} --build ${BUILD} \
+	--add-tag=www-misc --add-tag=server \
+	--add-dep='php>=5.2.12' #--add-dep='httpd>=2.2.14'
+mpkg -P -G gendeps2 $PKG
+
+rm -f $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.t?z
+
+cd $PKG
+/sbin/makepkg -l y -c n -p $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.t?z
+rm -rf $PKG $TMP/$PRGNAM /tmp/mpkg*
+
+cd $CWD
+rm -f $PRGNAM-$SRCVER.$ARC $PRGNAM-$VERSION-$ARCH-$BUILD.txz.validate *~

@@ -1,0 +1,84 @@
+#!/bin/sh
+# Copyright 2008 Loris Vincenzi (http://www.slacky.eu)
+# All rights reserved.
+#
+# Heavily based on the Slackware 12.2 SlackBuild
+# http://icculus.org/openbox/index.php/ObConf:About
+# Requirements: Openbox
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Modified by NK for MOPSLinux
+
+CWD=`pwd`
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/obconf
+NAME=obconf
+VERSION=2.0.3
+ARCH=${ARCH:-i686}
+BUILD=1nk
+
+if [ "$ARCH" = "i386" ]; then
+  SLKCFLAGS="-O2 -march=i386 -mcpu=i686"
+elif [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2"
+elif [ "$ARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2"
+fi
+
+if [ ! -d $TMP ]; then
+ mkdir -p $TMP
+fi
+if [ ! -d $PKG ]; then
+ mkdir -p $PKG
+fi
+
+cd $TMP
+tar xzvf $CWD/$NAME-$VERSION.tar.gz
+cd $NAME-$VERSION
+chmod -R u+w,go+r-w,a-s .
+chown -R root:root .
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+
+make
+make install DESTDIR=$PKG
+
+mkdir -p $PKG/usr/doc/$NAME-$VERSION
+cp -a AUTHORS COPYING CHANGELOG NEWS README TODO $PKG/usr/doc/$NAME-$VERSION
+sed -i "s|Icon=openbox|Icon=/usr/share/pixmaps/openbox.png|g" $PKG/usr/share/applications/obconf.desktop
+sed -i "s|Icon=openbox|Icon=/usr/share/pixmaps/openbox.png|g" $PKG/usr/share/mimelnk/application/x-openbox-theme.desktop
+
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+cat $CWD/$NAME.SlackBuild > $PKG/install/$NAME.SlackBuild
+
+requiredbuilder -v -y -s $CWD $PKG
+makepkg -l y -c n $CWD/$NAME-$VERSION-$ARCH-$BUILD.tgz
+
+if [ "$1" = "--cleanup" ]; then
+ rm -rf $TMP
+fi

@@ -1,0 +1,26 @@
+pkgname=kdesdk
+pkgver=4.12.0
+pkgbuild=1
+arch=noarch
+shortdesc=('KDE Software Development Kit')
+tags=('kde-misc virtual')
+
+adddep="cervisia \
+dolphin-plugins \
+kapptemplate \
+kcachegrind \
+kde-dev-scripts \
+kde-dev-utils \
+kdesdk-kioslaves \
+kdesdk-strigi-analyzers \
+kdesdk-thumbnailers \
+libkomparediff2 \
+kompare \
+lokalize \
+okteta \
+poxml \
+umbrello"
+
+build() {
+echo "Building virtual package"
+}

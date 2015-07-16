@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+   
+                   |-----handy-ruler------------------------------------------------------|
+rezlooks-gtk-engine: Rezlooks Gtk Engine (GTK 2.x Theme/Style)
+rezlooks-gtk-engine:
+rezlooks-gtk-engine: Rezlooks is a gtk theme engine based on the cairo-enabled CVS 
+rezlooks-gtk-engine: clearlooks engine code. 
+rezlooks-gtk-engine: License: GPL.
+rezlooks-gtk-engine: 
+rezlooks-gtk-engine: http://gnome-look.org/
+rezlooks-gtk-engine:
+rezlooks-gtk-engine:
+rezlooks-gtk-engine:
+rezlooks-gtk-engine:

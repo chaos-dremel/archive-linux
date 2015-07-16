@@ -1,0 +1,4 @@
+36c36
+< $default_lng='en';
+---
+> $default_lng='ru';

@@ -1,0 +1,12 @@
+35,37c35,41
+< [Slackware]
+< Image = "Slackware.png"
+< Files = "/etc/slackware-release;/etc/slackware-version"
+---
+> #[Slackware]
+> #Image = "Slackware.png"
+> #Files = "/etc/slackware-release;/etc/slackware-version"
+> 
+> [MOPSLinux]
+> Image = "MOPSLinux.png"
+> Files = "/etc/mopslinux-version"

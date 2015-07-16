@@ -1,0 +1,77 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=clementine-xine
+pkgver=0.7
+pkgbuild=1
+arch=('auto')
+
+shortdesc="clementine (xine), a cross-platform music player based on Amarok 1.4"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Clementine is a modern music player and library organiser. Clementine is a"
+	  "port of Amarok 1.4, with some features rewritten to take advantage of Qt4." 
+""
+	  "WARNING! The following engines are NOT supported by clementine developers:"
+    	  "xine. Don't post any bugs if you use them, fix them yourself!"
+""
+	  "Homepage: http://code.google.com/p/clementine-player/"
+)
+
+source=("http://clementine-player.googlecode.com/files/clementine-${pkgver}.tar.gz")
+#source=("svn:http://clementine-player.googlecode.com/svn/trunk/")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="media-sound xapps"
+
+#dependencies only needed to build package
+build_deps="liblastfm"
+
+provides="clementine"
+conflicts=""
+
+adddep="" #gst-ffmpeg gst-plugins-good gst-plugins-ugly"
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="cmake"
+BUILD_KEYS="\
+-DCMAKE_INSTALL_PREFIX=/usr \
+-DCMAKE_BUILD_TYPE=RELEASE \
+-DLIB_DIR=lib${LIBDIRSUFFIX} \
+-DLIB_SUFFIX=${LIBDIRSUFFIX} \
+-DENGINE_GSTREAMER_ENABLED=OFF \
+-DENGINE_LIBVLC_ENABLED=OFF \
+-DENGINE_LIBXINE_ENABLED=ON \
+-DENGINE_QT_PHONON_ENABLED=OFF \
+-DENABLE_VISUALISATIONS=ON \
+../"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

@@ -1,0 +1,75 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=phoronix-test-suite
+pkgver=4.2.0
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="The most comprehensive testing and benchmarking platform available for Linux"
+#longdesc=(""
+#)
+
+source=("http://www.phoronix.net/downloads/phoronix-test-suite/releases/phoronix-test-suite-$pkgver.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="app-benchmarks utils"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep="php"
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+  cd $srcdir/phoronix-test-suite
+  sed -i 's#-packages.sh#-packages.sh --asdeps#' pts-core/objects/client/pts_external_dependencies.php || exit 1
+  install -d $pkgdir/usr/bin $pkgdir/usr/share/phoronix-test-suite || exit 1
+  sed -e "s/^export PTS_DIR=.*/export PTS_DIR=\/usr\/share\/phoronix-test-suite/g" -i phoronix-test-suite || exit 1
+  install -m755 phoronix-test-suite $pkgdir/usr/bin/ || exit 1
+  rm -f $pkgdir/usr/share/phoronix-test-suite/pts/etc/scripts/package-build-* || exit 1
+  cp -r pts-core/ $pkgdir/usr/share/phoronix-test-suite/ || exit 1
+
+}
+
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+
+#}

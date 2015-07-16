@@ -1,0 +1,8 @@
+pysetuptools>=0.6c11
+pyxdg>=0.19
+twisted>=10.0.0
+zope.interface>=3.5.3
+chardet>=2.0.1
+libtorrent-rasterbar>=0.14.9
+notify-python>=0.1.1
+mako>=0.3.2

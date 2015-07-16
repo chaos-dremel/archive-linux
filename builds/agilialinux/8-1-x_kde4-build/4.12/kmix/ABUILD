@@ -1,0 +1,18 @@
+pkgname=kmix
+pkgver=4.11.2
+pkgbuild=1
+arch=("auto")
+
+shortdesc=("KDE volume control program")
+
+tags=("kde4 kde-base")
+
+source=("ftp://ftp.kde.org/pub/kde/stable/${pkgver}/src/${pkgname}-${pkgver}.tar.xz")
+
+BUILD_SYSTEM="cmake"
+BUILD_KEYS="-DCMAKE_INSTALL_PREFIX=/usr \
+	-DLIB_SUFFIX=${LIBDIRSUFFIX} \
+	-DMAN_INSTALL_DIR=/usr/man \
+	-DSYSCONF_INSTALL_DIR=/etc \
+	-DCMAKE_BUILD_TYPE=Release"
+INSTALL_KEYS="DESTDIR=$pkgdir"

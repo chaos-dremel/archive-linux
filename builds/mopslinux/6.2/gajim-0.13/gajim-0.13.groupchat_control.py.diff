@@ -1,0 +1,12 @@
+ --- a/src/groupchat_control.py	Wed Nov 25 12:01:49 2009 +0100
++++ b/src/groupchat_control.py	Wed Nov 25 12:02:45 2009 +0100
+@@ -647,7 +647,7 @@
+ 		bookmark_separator = xml.get_widget('bookmark_separator')
+ 		separatormenuitem2 = xml.get_widget('separatormenuitem2')
+ 
+-		if hide_buttonbar_entries:
++		if hide_buttonbar_items:
+ 			change_nick_menuitem.hide()
+ 			change_subject_menuitem.hide()
+ 			bookmark_room_menuitem.hide()
+

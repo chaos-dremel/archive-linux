@@ -1,0 +1,527 @@
+#!/bin/bash
+######################################################################################
+###################### Start SlackBuild ##############################################
+########## Set Function and Vars Определение функций и переменных ####################
+######################################################################################
+########################## !!! WARNING !!! ВНИМАНИЕ !!! ##############################
+#This is an automatically generated script. Basic things like package name, version  #
+#and other was taken from MOPSBUILD file. All other functions are located in mkpkg   #
+#script. If you find any error or can offer any impovment, feel free to mail us!     #
+#                                    ###                                             #
+#Это автоматически сгенерированный скрипт. Базовые вещи, такие как имя, версия пакетa#
+#и прочие вещи взяты из файла MOPSBUILD. Все прочие функции назодятся в файле mkpkg  #
+#Если вы нашли какую-либо ошибку или у вас есть предложение по улучшению - пишите нам#
+#                                    ###                                             #
+#Contacts/Контакты:                                                                  #
+# wiki: http://wiki.mopspackages.ru/doku.php?id=talk:makepkg_changelog               #
+# mail: archer at programmist dot ru ; uh dot linux at gmail dot com                 #
+######################################################################################
+ 
+############################ Set Vars Начальные переменные ###########################
+startdir=`pwd`
+workdirs="src pkg"
+srcdir=$startdir/src
+pkgdir=$startdir/pkg
+filedir=$startdir/files
+patchdir=$startdir/patches
+
+cwd_owner=nk
+cwd_group=users
+package_out_dir=
+BT_BUILD=
+pkgformat=txz
+ARCH=i686
+MOPSBUILD=MOPSBUILD
+
+################# Set Assisted Vars Вспомагательные функции ###########################
+check_for_root() {
+  if [ "$UID" != "0" ]; then
+    echo "You need to be ROOT"
+    exit 1
+  fi
+}
+ 
+clean_dirs() {
+        for DIR in $workdirs; do
+                if [ -e $startdir/$DIR ]; then
+                        rm -rf $startdir/$DIR  || exit 1
+                fi
+        done
+        if [ "$REMOVE_SVN" = "1" ]; then
+    	    rm -rf $startdir/$pkgname || exit 1
+    	fi
+}
+clean_svn(){
+    	    rm -rf $startdir/$pkgname || exit 1
+}
+ 
+prepare_directory() {
+        for DIR in $workdirs; do
+                if [ ! -e $DIR ]; then
+                         install -d $DIR || exit 1
+                fi
+        done
+        mkdir -p ${pkgdir}/install  || exit 1
+        chown -R root:root ${startdir}/{files,patches}>/dev/null 2>&1
+        chmod -R u+w,go+r-w,a-s ${startdir}/{files,patches}>/dev/null 2>&1
+}
+
+unlock_dirs() {
+chown -R ${cwd_owner}:${cwd_group} ${startdir}/{files,patches} >/dev/null 2>&1
+}
+
+############## Set Main Functions Основныек функции ##################################  
+gen_meta_options() {
+  META_OPTIONS=""
+  for tag in ${tags// / } ;
+  do
+  META_OPTIONS+="--add-tag=$tag "
+  done
+  if [ -e $startdir/CHANGELOG ]; then
+      META_OPTIONS+="--changelog=$startdir/CHANGELOG "
+  fi
+ 
+  if [ -n "${adddep}" ]; then
+      for dep in ${adddep// / } ;
+      do
+          META_OPTIONS+="--add-dep=$dep "
+      done
+  fi
+  
+  if [ -n "${provides}" ]; then
+    META_OPTIONS+="--provides=${provides} "
+  fi
+  
+  if [ -n "${conflicts}" ]; then
+    META_OPTIONS+="--conflicts=${conflicts} "
+  fi
+  
+  if [ -n "$removedep" ]; then
+      for rd in ${removedep// / } ;
+      do
+          DELDEP+="--remove-dep=$rd "
+      done
+  fi
+#--------------------------------------------------------------------------
+}
+set_pre_permissions() {
+  cd $startdir/src  || exit 1
+  chown -R root:root .
+  chmod -R u+w,go+r-w,a-s .
+ # 
+#  find . -perm 664 -exec chmod 644 {} \;
+#  find . -perm 600 -exec chmod 644 {} \;
+#  find . -perm 444 -exec chmod 644 {} \;
+#  find . -perm 400 -exec chmod 644 {} \;
+###  find . -perm 440 -exec chmod 644 {} \;
+#  find . -perm 777 -exec chmod 755 {} \;
+#  find . -perm 775 -exec chmod 755 {} \;
+#  find . -perm 511 -exec chmod 755 {} \;
+#  find . -perm 711 -exec chmod 755 {} \;
+#  find . -perm 555 -exec chmod 755 {} \;
+#chown -R root:root .  
+}
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+ 
+set_build_options() {
+package=${pkgname}-${pkgver}-${ARCH}-${pkgbuild}
+CHOST=$ARCH
+ 
+if [ "$ARCH" = "i386" ]; then
+  SLKCFLAGS="-O2 -march=i386 -mcpu=i686"
+elif [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2"
+elif [ "$ARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+elif [ "$ARCH" = "x86_64" ]; then
+   SLKCFLAGS="-O2 -fPIC"
+   LIBDIRSUFFIX=64
+fi
+}
+#------------------------------------------------------------------------------------
+ 
+get_extract_source() {
+if [ "$1" ]; then 
+ext_arg=$1
+fi
+# ${ext_arg}-slackbuild argument, can be -r, means not to unpack source. Here we check
+# for it to obtain version for git/svn/hg sources
+if [ ! "${source}" = "" ]; then 
+ for it in `seq 0 $((${#source[@]}-1))`; do
+     set -- ${source[it]}
+     item=$1
+     cd $startdir
+     loc_source=$(basename $item)
+     if [ -f ${startdir}/$loc_source ]; then
+	  item=$loc_source
+     fi
+      protocol=$(echo "$item" | sed 's|:.*||')
+      case $protocol in
+      http|ftp)
+    	  if [ ! ${ext_arg} ]; then
+	    wget $item  || exit 1
+    	    if [ ! "$2" = "n" ]; then
+        	unpack $loc_source  || exit 1
+            fi
+    	  fi
+      ;;
+      svn)
+        if [ ! ${ext_arg} ]; then
+            item=$(echo "$item" | sed 's/^svn:*//')
+	    svn checkout $item $pkgname
+            cp -a -r ${startdir}/${pkgname} ${srcdir}
+        fi
+	    cd $pkgname || exit 1
+	    pkgver+=_svn`svn info | grep Revi | cut -d ":" -f2 | cut -c2-`
+            cd - || exit 1
+      ;;
+      git)
+        if [ ! ${ext_arg} ];then 
+        
+    	    item=$(echo "$item" | sed 's/^git:*//')
+              if [ ! -d $pkgname ]; then
+	        git clone $item $pkgname
+    	      else
+            cd $pkgname
+		git pull
+    	    fi
+        	cp -a -r ${startdir}/${pkgname} ${srcdir}
+        fi
+        pkgver+=_git`date "+%Y%m%d"`
+      ;;                           
+  hg)
+	if [ ! ${ext_arg} ];then
+	    item=$(echo "$item" | sed 's/^hg:*//')
+	    if [ ! -d $pkgname ]; then
+    	        hg clone $item $pkgname
+	    else
+	        cd $pkgname
+		hg pull && hg update  
+           fi
+    	   cp -a -r ${startdir}/${pkgname} ${srcdir}
+    	fi
+     pkgver+=_hg`date "+%Y%m%d"`
+      ;;                           
+    
+  *)
+  if [ ! "$2" = "n" -a -z "${ext_arg}" ]; then
+  unpack $loc_source || exit 1
+  fi
+  ;;
+   esac
+ done
+ chown ${cwd_owner}:${cwd_group} ${startdir}/$loc_source>/dev/null 2>&1
+
+fi
+}
+ 
+ 
+unpack()
+{
+cd $startdir/src
+      file_type=$(file -biz "$startdir/$1")
+      unset cmd
+      case "$file_type" in
+        *application/x-tar*)
+          cmd="tar -xvf" ;;
+        *application/zip*)
+          cmd="unzip" ;;
+        *application/x-zip*)
+          cmd="unzip" ;;
+        *application/x-gzip*)
+          cmd="gunzip -d -f" ;;
+        *application/x-bzip*)
+          cmd="bunzip2 -f" ;;
+        *application/x-rar*)
+    	  cmd="unrar e" ;;
+      esac
+ 
+      if [ "$cmd" != "" ]; then
+             $cmd $startdir/$1
+      fi
+}
+ 
+burn_patches(){
+if [ -d $startdir/patches ]; then 
+    curr_dir=`pwd`
+    cd $startdir/patches
+    patch_list=`ls -1`
+ 
+    cd $curr_dir
+ 
+    for file in $patch_list; 
+    do
+    p=1
+	if [ ! "$patch_opts" = "" ]; then
+	    for patch_item in `seq 0 $((${#patch_opts[@]}-1))`
+	     do
+		set -- ${patch_opts[patch_item]}
+		if [ "$file" = "$1" ]; then
+		    p=$2
+		fi
+	    done
+	fi
+	echo "--==Using patch file ${file}==--"
+    case ${file##*.} in
+	gz)
+	
+	zcat $startdir/patches/$file | patch -p${p} --verbose -t || exit 1
+	;;
+	*)
+	
+	patch -p${p} -i $startdir/patches/$file --verbose -t || exit 1
+	;;
+    esac
+ 
+    done
+fi
+}
+ 
+ 
+create_slackdesc() {
+cat << EODESC > $startdir/slack-desc
+${pkgname}: ${shortdesc}
+${pkgname}:
+EODESC
+    for str in `seq 0 $((${#longdesc[@]}-1))`
+    do
+	echo "${pkgname}: ${longdesc[str]}" >> $startdir/slack-desc
+    done
+install -m644 $startdir/slack-desc $pkgdir/install/slack-desc
+chown ${cwd_owner}:${cwd_group} $startdir/slack-desc>/dev/null 2>&1
+}
+ 
+set_post_permissions() {
+  for DIRS in usr/share/icons usr/doc; do
+    if [ -d "${pkgdir}/$DIRS" ]; then
+      if [ "$DIRS" == "usr/doc" ]; then
+        find ${pkgdir}/$DIRS -type f -exec chmod 644 {} \;
+        find ${pkgdir}/$DIRS -type d -exec chmod 755 {} \;
+      fi
+    fi
+    [ -d ${pkgdir}/$DIRS ] && chown root:root -R ${pkgdir}/$DIRS
+  done
+  [ -d ${pkgdir}/usr/bin ] && find ${pkgdir}/usr/bin -user root -group bin -exec chown root:root {} \;
+}
+ 
+create_package() {
+  cd $pkgdir
+  mpkg-setmeta ${pkgdir} --keep-symlinks --name=${pkgname} --version=${pkgver} --arch=$ARCH --build=$pkgbuild --maintainer-name=$author --maintainer-email=$email $META_OPTIONS  || exit 1
+  mpkg -G gendeps2 ${pkgdir} || exit 1
+ if [ -n $DELDEP ]; then
+  mpkg-setmeta ${pkgdir} $DELDEP
+ fi
+ make_build_tree
+ out_dir=${package_out_dir:-${startdir}}
+ /sbin/makepkg -l n -c n -p ${out_dir}/${package}.${pkgformat} || exit 1
+  mpkg-validate ${out_dir}/$package.${pkgformat} || exit 1
+  val_size=`du ${out_dir}/$package.${pkgformat}.validate --apparent-size -h | cut -f1`
+  if [ "$val_size" = "19" ]; then
+      rm -f ${out_dir}/$package.${pkgformat}.validate
+  else
+    chown ${cwd_owner}:${cwd_group} ${out_dir}/$package.${pkgformat}.validate>/dev/null 2>&1
+  fi
+  chown ${cwd_owner}:${cwd_group} ${out_dir}/$package.${pkgformat}>/dev/null 2>&1
+}
+create_package_generic() {
+cd ${pkgdir}
+make_build_tree
+out_dir=${package_out_dir:-${startdir}}
+/sbin/makepkg -l n -c n -p ${out_dir}/${package}.${pkgformat} || exit 1
+chown ${cwd_owner}:${cwd_group} ${out_dir}/$package.${pkgformat}>/dev/null 2>&1
+
+}
+ 
+strip_binaries() {
+  cd ${pkgdir}
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | \
+  xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | \
+  xargs strip --strip-unneeded 2> /dev/null
+}
+copy_doinst() {
+
+if [ -e $startdir/slack-desc ]; then
+    cat $startdir/slack-desc > $pkgdir/install/slack-desc
+fi
+ 
+case `file -b $startdir/doinst.sh*` in
+  ASCII*)
+  install -m755 $startdir/doinst.sh $pkgdir/install/doinst.sh
+  ;;
+  gzip*)
+  zcat $startdir/doinst.sh.gz > $pkgdir/install/doinst.sh
+  chmod 755 $pkgdir/install/doinst.sh
+  ;;
+esac
+}
+ 
+gzip_man_and_info_pages() {
+  for DOCS in man info; do
+    if [ -d "${pkgdir}/usr/share/$DOCS" ]; then
+      mv ${pkgdir}/usr/share/$DOCS ${pkgdir}/usr/$DOCS
+      if [[ ! "$(ls ${pkgdir}/usr/share)" ]]; then
+        rm -rf ${pkgdir}/usr/share
+      fi
+    fi
+    if [ -d "${pkgdir}/usr/$DOCS" ]; then
+      # I've never seen symlinks in info pages....
+      if [ "$DOCS" == "man" ]; then
+        (cd ${pkgdir}/usr/$DOCS
+        for manpagedir in $(find . -type d -name "man*" 2> /dev/null) ; do
+          ( cd $manpagedir
+          for eachpage in $( find . -type l -maxdepth 1 2> /dev/null) ; do
+            ln -s $( readlink $eachpage ).gz $eachpage.gz
+            rm $eachpage
+          done )
+        done)
+      fi
+      find ${pkgdir}/usr/$DOCS -type f -exec gzip -9 -f '{}' \;
+    fi
+  done
+}
+ 
+get_numjobs()
+{
+if [ -z "${numjobs}" ]; then
+    x=`cat /proc/cpuinfo | grep "cpu cores" -m 1| cut -d ":" -f2 | cut -d " " -f2`
+    if [ -n "$x" ]; then 
+        let "numjobs=x+1"
+    else
+	numjobs=2
+    fi
+fi
+}
+copy_doc() {
+ docs+=("AUTHORS BUGS BUILD COMPILERS COPYING* NEWS README* \
+ TODO ChangeLog* LICENSE* License* HACKING")
+ mkdir -p ${pkgdir}/usr/doc/$pkgname-$pkgver
+ for docfile in ${docs[@]}
+ do
+    install -m644 ${docfile} ${pkgdir}/usr/doc/$pkgname-$pkgver/`basename ${docfile}`
+ done
+ 
+ if [ -e ${startdir}/files/${pkgname}.desktop ]; then
+ install -Dm644  ${startdir}/files/${pkgname}.desktop  ${pkgdir}/usr/share/applications/${pkgname}.desktop
+ fi
+ if [ -e ${startdir}/files/${pkgname}.png ]; then
+ install -Dm644 ${startdir}/files/${pkgname}.png ${pkgdir}/usr/share/pixmaps/${pkgname}.png
+ fi
+ 
+}
+
+make_build_tree() {
+#Creating Build Tree
+cd ${startdir}
+mkdir -p ${pkgdir}/usr/src/SlackBuilds || exit 1
+tarfiles="files patches CHANGELOG slack-desc doinst.sh doinst.sh.gz"
+mkdir -p $startdir/files
+install -m644  ${pkgdir}/install/data.xml $startdir/files/data.xml
+tar Jcf ${pkgdir}/usr/src/SlackBuilds/${pkgname}-${pkgver}.build_tree.tar.xz --ignore-failed-read \
+--owner=root --group=root --mode=644 \
+files patches CHANGELOG slack-desc doinst.sh doinst.sh.gz ${MOPSBUILD}
+cd ${pkgdir}
+}
+
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=pysetuptools
+pkgver=0.6c11
+pkgbuild=2
+arch=('auto')
+
+shortdesc="setuptools"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Download, build, install, upgrade, and uninstall Python packages --"
+	  "easily!"
+""
+	  "Homepage: http://pypi.python.org/pypi/setuptools"
+)
+
+source=("http://pypi.python.org/packages/source/s/setuptools/setuptools-$pkgver.tar.gz")
+
+docs="*.txt PKG-INFO"
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="dev-python develop"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/setuptools-$pkgver
+
+burn_patches
+
+python setup.py install --root=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}
+
+##################### Start Work SlackBuild Начало выполнения SlackBuild ##################
+
+check_for_root
+
+if [ ! "$1" = "-r" ]; then 
+clean_dirs
+else
+rm -rf ${pkgdir}
+fi
+
+get_numjobs
+prepare_directory
+get_extract_source $1
+
+if [ ! "$1" = "-r" ]; then 
+set_pre_permissions
+fi
+
+set_build_options
+gen_meta_options
+ 
+before_build
+build
+copy_doc
+after_build
+strip_binaries
+create_slackdesc
+copy_doinst
+set_post_permissions
+gzip_man_and_info_pages
+create_package
+clean_dirs
+unlock_dirs

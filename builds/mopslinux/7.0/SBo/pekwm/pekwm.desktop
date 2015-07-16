@@ -1,0 +1,7 @@
+[Desktop Entry] 
+Encoding=UTF-8 
+Type=XSession
+Exec=/usr/bin/pekwm
+TryExec=/usr/bin/pekwm
+Name=PekWM
+Comment=PekWM is a window manager

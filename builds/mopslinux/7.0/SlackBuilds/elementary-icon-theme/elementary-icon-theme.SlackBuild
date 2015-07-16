@@ -1,0 +1,92 @@
+#!/bin/sh
+
+# Slackware build script for elementary Icons
+
+# Copyright 2009 NK <nk-man@yandex.ru>
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+NAME=elementary
+
+PRGNAM=elementary-icon-theme
+VERSION=${VERSION:-2.3}
+ARCH=noarch
+BUILD=${BUILD:-2}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-$CWD}
+
+DOC="AUTHORS COPYING CONTRIBUTORS"
+
+SRCPRG=elementary
+SRCVER=$VERSION
+ARC=${ARC:-tar.gz}
+SRC=http://launchpad.net/elementaryicons/2.0/$VERSION/+download/$SRCPRG.$ARC 
+if [ ! -e $SRCPRG.$ARC ]; then
+	wget -c $SRC
+fi
+
+set -e
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+rm -rf $TMP/$PRGNAM-$VERSION
+mkdir -p $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+tar xvf $CWD/$SRCPRG.tar.?z* || exit 1
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+cd $SRCPRG
+
+rm -rf *~
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+mv $DOC $PKG/usr/doc/$PRGNAM-$VERSION
+chmod 644 $PKG/usr/doc/$PRGNAM-$VERSION/*
+
+mkdir -p $PKG/usr/share/icons/$NAME
+mv * $PKG/usr/share/icons/$NAME
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+#cat $CWD/doinst.sh > $PKG/install/doinst.sh
+#cat $CWD/postremove.sh > $PKG/install/postremove.sh
+
+cd $CWD
+mkdir -p $PKG/usr/src/SlackBuilds
+tar Jcf $PKG/usr/src/SlackBuilds/${PRGNAM}.build_tree.tar.xz --ignore-failed-read \
+	$PRGNAM.SlackBuild slack-desc *.sh.gz *.sh *.desktop patches/ ADD-DEP
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg-setmeta $PKG --keep-symlinks --name=${PACKAGE_NAME} \
+	--maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+	--version=${VERSION} --arch=${ARCH} --build ${BUILD} \
+	--add-tag=x11-themes --add-tag=themes
+mpkg -P -G gendeps2 $PKG
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.t?z
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*

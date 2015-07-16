@@ -1,0 +1,172 @@
+#!/bin/sh
+
+# Slackware build script for fftw
+# Written by Kyle Guinn <elyk03@gmail.com>
+
+# Modified for MOPSLinux <www.mopslinux.org> by NK <nk-man@yandex.ru>
+
+PRGNAM=fftw
+VERSION=${VERSION:-3.2.2}
+ARCH=${ARCH:-i686}
+BUILD=${BUILD:-2}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg/SBo}
+PKG=$TMP/package-$PRGNAM-$VERSION
+OUTPUT=${OUTPUT:-$CWD}
+
+DOCS="AUTHORS CONVENTIONS COPY* ChangeLog INSTALL NEWS README* TODO doc/html"
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
+fi
+
+if [ "${PORTABLE:-no}" = "no" ]; then
+    # According to doc/fftw3.pdf the configure script should choose the best
+    # value for $CFLAGS.  These variables must be unset so that the configure
+    # script will decide.
+
+    # If you are interested in further optimizations such as alternative
+    # multithreading and support for other processors, check this page for
+    # details:
+    # http://www.fftw.org/fftw3_doc/Installation-on-Unix.html
+    unset CFLAGS
+    unset CXXFLAGS
+    unset FFLAGS
+    PKGARCH="custom"
+    do_portable=""
+else
+    PKGARCH=$ARCH
+    do_portable="--enable-portable-binary"
+fi
+
+if [ "${SSE:-no}" = "no" ]; then
+    do_sse=""
+else
+    do_sse="--enable-sse"
+fi
+
+if [ "${SSE2:-no}" = "no" ]; then
+    do_sse2=""
+else
+    do_sse2="--enable-sse2"
+fi
+
+set -e
+
+SRCNAM=$PRGNAM
+SRCVER=$VERSION
+ARC=${ARC:-tar.gz}
+SRC=ftp://ftp.fftw.org/pub/fftw/$PRGNAM-$VERSION.$ARC 
+if [ ! -e $PRGNAM-$VERSION.$ARC ]; then
+	wget -c $SRC
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+cd $TMP
+rm -rf $PRGNAM-$VERSION
+tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+cd $PRGNAM-$VERSION
+chown -R root:root .
+chmod -R u+w,go+r-w,a-st .
+
+# compile libfftw3
+./configure \
+    --prefix=/usr \
+    --libdir=/usr/lib${LIBDIRSUFFIX} \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --mandir=/usr/man \
+    --infodir=/usr/info \
+    --docdir=/usr/doc/fftw-$VERSION \
+    --enable-shared \
+    --disable-static \
+    --enable-threads \
+    $do_sse2 \
+    $do_portable
+make
+make install-strip DESTDIR=$PKG
+
+# compile libfftw3f
+./configure \
+    --prefix=/usr \
+    --libdir=/usr/lib${LIBDIRSUFFIX} \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --mandir=/usr/man \
+    --infodir=/usr/info \
+    --docdir=/usr/doc/fftw-$VERSION \
+    --enable-shared \
+    --disable-static \
+    --enable-threads \
+    --enable-float \
+    $do_sse \
+    $do_portable
+make
+make install-strip DESTDIR=$PKG
+
+# compile libfftw3l
+./configure \
+    --prefix=/usr \
+    --libdir=/usr/lib${LIBDIRSUFFIX} \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --mandir=/usr/man \
+    --infodir=/usr/info \
+    --docdir=/usr/doc/fftw-$VERSION \
+    --enable-shared \
+    --disable-static \
+    --enable-threads \
+    --enable-long-double \
+    $do_portable
+make
+make install-strip DESTDIR=$PKG
+
+( cd $PKG/usr/man
+    find . -type f -exec gzip -9 {} \;
+    for i in $(find . -type l); do \
+        ln -s $(readlink $i).gz $i.gz; \
+        rm $i; \
+    done
+)
+
+rm -f $PKG/usr/info/dir
+gzip -9 $PKG/usr/info/*
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# MPKG
+cd $CWD
+mkdir -p $PKG/usr/src/SlackBuilds
+tar Jcf $PKG/usr/src/SlackBuilds/${PRGNAM}.build_tree.tar.xz --ignore-failed-read \
+	$PRGNAM.SlackBuild slack-desc *.sh.gz *.sh *.desktop *.new patches/
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg-setmeta $PKG --keep-symlinks --name=${PACKAGE_NAME} \
+	--maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+	--version=${VERSION} --arch=${ARCH} --build ${BUILD} \
+	--add-tag=sci-libs --add-tag=libs
+mpkg -P -G gendeps2 $PKG
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.${PKGTYPE:-txz}
+
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.t?z
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*
+
+cd $CWD
+rm -f $SRCNAM-$SRCVER.$ARC $PRGNAM-$VERSION-$ARCH-$BUILD.txz.validate

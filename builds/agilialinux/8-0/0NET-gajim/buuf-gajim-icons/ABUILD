@@ -1,0 +1,72 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=buuf-gajim-icons
+pkgver=1.0
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="Theme Buuf for Gajim"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("This is a theme/iconset for Gajim by OxayotlTheGreat. All credit for these wonderful icons goes to Mattahan : http://mattahan.deviantart.com ! License: Creative Commons by-nc-sa. Homepage: http://gnome-look.org/content/show.php/Theme+Buuf+for+Gajim?content=103768"
+)
+
+source=("http://perso.ens-lyon.fr/jeanalexandre.angles_dauriac/buuf_for_gajim.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="x11-themes themes"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+go_src_dir
+
+mkdir -p ${pkgdir}/usr/share/gajim/data/iconsets/ 
+cp -rv ./iconset/buuf ${pkgdir}/usr/share/gajim/data/iconsets/ || exit 1
+}

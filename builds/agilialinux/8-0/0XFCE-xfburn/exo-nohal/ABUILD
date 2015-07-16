@@ -1,0 +1,84 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=exo-nohal
+pkgver=0.5.3
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Application library for the Xfce desktop environment"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Библиотека приложений для XFCE"
+)
+
+source=("git:git://git.xfce.org/xfce/exo")
+#source=("http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.bz2")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="xfce xfce-base"
+
+#dependencies only needed to build package
+build_deps="xfce4-dev-tools" # libxfce4util
+
+provides="exo"
+conflicts="" #exo"
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="autotools"
+
+#BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./autogen.sh" # --help"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc/xfce \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= \
+--disable-debug \
+--disable-gio-unix \
+--disable-python \
+--with-x \
+--docdir=/usr/doc/${pkgname}-${pkgver} \
+--enable-gen-doc \
+|| exit 1"
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

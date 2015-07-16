@@ -1,0 +1,65 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=pysetuptools
+pkgver=0.6c11
+pkgbuild=2
+arch=('auto')
+
+shortdesc="setuptools"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Download, build, install, upgrade, and uninstall Python packages --"
+	  "easily!"
+""
+	  "Homepage: http://pypi.python.org/pypi/setuptools"
+)
+
+source=("http://pypi.python.org/packages/source/s/setuptools/setuptools-$pkgver.tar.gz")
+
+docs="*.txt PKG-INFO"
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="dev-python develop"     			#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/setuptools-$pkgver
+
+burn_patches
+
+python setup.py install --root=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+     |-----handy-ruler------------------------------------------------------|
+iotop: iotop - simple top-like I/O monitor
+iotop: 
+iotop: Iotop is a Python program with a top like UI used to show of behalf 
+iotop: of which process is the I/O going on. It requires Python ≥ 2.5 (or 
+iotop: Python ≥ 2.4 with the ctypes module) and a Linux kernel ≥ 2.6.20 
+iotop: with the TASK_DELAY_ACCT and TASK_IO_ACCOUNTING options enabled.
+iotop:
+iotop: Homepage: http://guichaz.free.fr/iotop/
+iotop:
+iotop:
+iotop:

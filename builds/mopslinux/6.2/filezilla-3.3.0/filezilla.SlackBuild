@@ -1,0 +1,108 @@
+#!/bin/sh
+
+#
+# filezilla slackbuild script
+#
+# AUTHOR=NomerUNO
+# EMAIL=navigator007@list.ru
+
+#
+# Modified by NK <nk-man@yandex.ru>
+
+PRGNAM=filezilla
+VERSION=${VERSION:-3.3.0}
+ARC=${ARC:-tar.bz2}
+SRCNAME=${SRCNAME:-FileZilla_${VERSION}_src}
+TAGS=network,
+ARCH=${ARCH:-i686}
+BUILD=${BUILD:-1}
+CWD=$(pwd)
+TMP=${TMP:-/tmp/NomerUNO/$PRGNAM-$VERSION}
+PKG=$TMP/FakeInstall
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+
+WEBLINK=${WEBLINK:-http://jaist.dl.sourceforge.net/sourceforge/filezilla/${SRCNAME}.${ARC}}
+
+DOC="doc docs AUTHORS BUGS BUILD COMPILERS COPYING NEWS README TODO"
+
+if [ "$ARCH" = "i486" ]; then
+ SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+ elif [ "$ARCH" = "i686" ]; then
+     SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+ elif [ "$ARCH" = "x86_64" ]; then
+     SLKCFLAGS="-O2 -fPIC"
+fi
+
+if [ ! -e ${SRCNAME}.${ARC} ]; then
+wget -c ${WEBLINK}
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+rm -rf $TMP/$PRGNAM-$VERSION
+cd $TMP || exit 1
+tar xvf $CWD/${SRCNAME}.$ARC || exit 1
+cd ${PRGNAM}-${VERSION} || exit 1
+chown -R root:root .
+chmod -R u+w,go+r-w,a-s .
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+
+./configure \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  --mandir=/usr/man \
+  --docdir=/usr/doc/$PRGNAM-$VERSION \
+  --enable-shared=yes \
+  --enable-static=no
+
+make -j4 || exit 1
+make install DESTDIR=$PKG || exit 1
+
+find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+  
+gzip -9 $PKG/usr/man/man?/*.?
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
+mv $PKG/usr/share/filezilla/docs/fzdefaults.xml.example $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+cat $CWD/doinst.sh > $PKG/install/doinst.sh
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $PKG
+
+echo "Make PKG"
+/sbin/makepkg -l y -c n -p $CWD/$PRGNAM-$VERSION$SVN-$ARCH-$BUILD.tgz || exit 1
+
+echo "Generating DATA.XML"
+mpkg convert $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz || exit 1
+
+mpkg -P gendeps2 $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz || exit 1
+
+TAGZ=""
+for tag in ${TAGS//,/ } ;
+do
+TAGZ+="--add-tag=$tag "
+done
+
+echo "Include META-INFO in package"
+mpkg-setmeta $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz --maintainer-name=$AUTHOR --maintainer-email=$EMAIL $TAGZ
+
+echo "Checking New Package"
+mpkg-validate $CWD/$PRGNAM-$VERSION$SVN-$ARCH-$BUILD.tgz
+
+cd $CWD
+tar vczf $PRGNAM-$VERSION-$BUILD.tar.gz slack-desc $PRGNAM.SlackBuild doinst.sh
+
+#delete build garbage
+rm -rf /tmp/NomerUNO /tmp/mpkg*

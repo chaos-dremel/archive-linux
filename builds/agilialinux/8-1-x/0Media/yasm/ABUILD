@@ -1,0 +1,30 @@
+# Package metadata
+pkgname=yasm
+pkgver=1.2.0
+pkgbuild=1
+arch="auto"
+
+# Package description
+shortdesc=("Yasm is a complete rewrite of the NASM assembler")
+
+# Source URL
+source=("http://www.tortall.net/projects/yasm/releases/yasm-${pkgver}.tar.gz")
+
+# Tags
+tags="develop dev-util"
+
+# Manually-added dependencies
+adddep=""
+
+# Build system
+BUILD_SYSTEM="autotools"
+BUILD_KEYS="--prefix=/usr \
+--bindir=/usr/bin \
+--sbindir=/usr/sbin \
+--libexecdir=/usr/libexec \
+--includedir=/usr/include \
+--mandir=/usr/man \
+--infodir=/usr/info \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--sysconfdir=/etc \
+--localstatedir=/var"

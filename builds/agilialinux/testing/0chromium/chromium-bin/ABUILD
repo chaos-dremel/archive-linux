@@ -1,0 +1,154 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+
+pkgname=chromium-bin
+provides=${pkgname/-bin/}
+
+pkgver=$(curl -s http://src.chromium.org/viewvc/chrome/ \
+	| grep "Incrementing VERSION to" \
+	| sed -e "s/<td>&nbsp;Incrementing VERSION to //g" -e "s/<\/td>//g")
+
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Chromium Web Browser"
+#longdesc=(""
+#)
+
+
+_arch='Linux'
+[ "$CARCH" = 'x86_64' ] && _arch='Linux_x64'
+_revver=$(curl -s "http://commondatastorage.googleapis.com/chromium-browser-continuous/$_arch/LAST_CHANGE")
+source=("http://commondatastorage.googleapis.com/chromium-browser-continuous/$_arch/$_revver/chrome-linux.zip")
+
+
+#if [[ ! -z "`curl -s http://src.chromium.org/viewvc/chrome/ | grep "chrome/releases" | grep $_revver`" ]]; then
+# source=("http://commondatastorage.googleapis.com/chromium-browser-continuous/$_arch/$_revver/chrome-linux.zip")
+#else
+# echo $_revver
+# curl -s http://src.chromium.org/viewvc/chrome/ | grep "chrome/releases" | grep $_revver
+# exit 1
+#fi
+
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="network www-client"
+
+#dependencies only needed to build package
+build_deps=""
+
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+
+# chrome-linux-dir
+mkdir -p $pkgdir/opt/
+chromedir="$pkgdir/opt/chromium"
+mv ../chrome-linux "$chromedir"
+
+
+# Adjust permissions
+find "$chromedir" -type d -exec chmod 755 {} ';'
+find "$chromedir" -type f -exec chmod 644 {} ';'
+chmod 755 "$chromedir"/chrome{,[_-]*}
+chmod 755 "$chromedir"/nacl*
+chmod 755 "$chromedir"/xdg-settings
+chmod 4755 "$chromedir"/chrome_sandbox
+chown 1000 "$chromedir"/chrome
+
+mkdir -p $pkgdir/usr/lib${LIBDIRSUFFIX}
+ln -sfv "${chromedir/$pkgdir/}" $pkgdir/usr/lib${LIBDIRSUFFIX}/chromium
+
+
+# Install some files
+cd $filedir
+
+mkdir -p $pkgdir/etc/chromium/
+install -m644 default "$pkgdir"/etc/chromium/
+
+mkdir -p "$pkgdir"/usr/bin/
+install -m755 chromium "$pkgdir"/usr/bin/
+
+mkdir -p "$pkgdir"/usr/share/man/man1/
+mv "$chromedir"/chrome.1 "$pkgdir"/usr/share/man/man1/chromium.1
+
+mkdir -p "$pkgdir"/usr/share/pixmaps/
+mv "$chromedir"/product_logo_48.png "$pkgdir"/usr/share/pixmaps/chromium.png
+
+
+# Symlink missing udev lib
+#if [[ ! -f /usr/lib${LIBDIRSUFFIX}/libudev.so.0 ]]; then
+# mkdir -p "$pkgdir"/usr/lib${LIBDIRSUFFIX}/
+# ln -fs /usr/lib${LIBDIRSUFFIX}/libudev.so.1 "$pkgdir"/usr/lib${LIBDIRSUFFIX}/libudev.so.0
+#fi
+
+
+# desktop-icon
+if [ -f "$pkgdir/usr/share/pixmaps/chromium.png" ]; then
+mkdir -p $pkgdir/usr/share/applications/
+cat << EOF > $pkgdir/usr/share/applications/${provides}.desktop
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Chromium
+Name[ru]=Chromium
+# Only KDE 4 seems to use GenericName, so we reuse the KDE strings.
+# From Ubuntu's language-pack-kde-XX-base packages, version 9.04-20090413.
+GenericName=Web Browser
+GenericName[ru]=Веб-браузер
+# Gnome and KDE 3 uses Comment.
+Comment=Web Browser
+Comment[ru]=Веб-браузер
+Exec=/usr/bin/chromium %U
+TryExec=/usr/bin/chromium
+Terminal=false
+Icon=chromium
+Type=Application
+Categories=Application;Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/mime;application/xml;application/rss+xml;application/rdf+xml;image/svg+xml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;
+EOF
+fi
+}
+
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+#
+#}

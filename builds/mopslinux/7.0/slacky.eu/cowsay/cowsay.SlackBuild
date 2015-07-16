@@ -1,0 +1,108 @@
+#!/bin/sh
+
+# Heavily based on the Slackware 12.2 SlackBuild
+# cowsay
+# http://www.nog.net/~tony/warez/cowsay.shtml
+# The Italian Slackware Community
+# http://www.slacky.eu/
+# Packager anycolouryoulike
+
+# Modified for MOPSLinux <www.mopslinux.org> by NK <nk-man@yandex.ru>
+
+NAME=cowsay
+VERSION=3.03
+TARBALL=$NAME-$VERSION
+ARCHIVE=tar.gz
+ARCH=i686
+BUILD=1
+SOURCE=http://www.nog.net/~tony/warez/$TARBALL.$ARCHIVE
+
+CWD=$(pwd)
+TMP=/tmp/txz/$NAME-$VERSION-$BUILD
+PKG=/tmp/pkg
+
+download_source() {
+if [ ! -f $TARBALL.$ARCHIVE ]; then
+    wget $SOURCE
+fi
+}
+clean_directories() {
+if [ ! -d $TMP ]; then
+    mkdir -p $TMP
+else
+    rm -rf $TMP/*
+fi
+if [ ! -d $PKG ]; then
+    mkdir -p $PKG
+else
+    rm -rf $PKG/*
+fi
+}
+explode_archive() {
+case $ARCHIVE in
+    tar.gz|txz) tar xvzf $CWD/$TARBALL.$ARCHIVE ;;
+    tar.bz2) tar xvjf $CWD/$TARBALL.$ARCHIVE ;;
+esac
+}
+set_permissions() {
+chown -R root:root .
+find -perm 664 -exec chmod 644 {} \;
+find -perm 600 -exec chmod 644 {} \;
+find -perm 444 -exec chmod 644 {} \;
+find -perm 400 -exec chmod 644 {} \;
+find -perm 440 -exec chmod 644 {} \;
+find -perm 777 -exec chmod 755 {} \;
+find -perm 775 -exec chmod 755 {} \;
+find -perm 511 -exec chmod 755 {} \;
+find -perm 711 -exec chmod 755 {} \;
+find -perm 555 -exec chmod 755 {} \;
+}
+copy_docs() {
+if [ ! -d $PKG/usr/doc/$NAME-$VERSION ]; then
+    mkdir -p $PKG/usr/doc/$NAME-$VERSION
+fi
+cat $CWD/slack-desc > $PKG/usr/doc/$NAME-$VERSION/slack-desc
+cat $CWD/$NAME.SlackBuild > $PKG/usr/doc/$NAME-$VERSION/$NAME.SlackBuild
+for FILE in AUTHORS BUGS COPYING ChangeLog DOCS HACKING INSTALL LICENSE MANIFEST NEWS README SITES THANKS TODO
+do
+    if [ -s $FILE ]; then
+	cp -a $FILE $PKG/usr/doc/$NAME-$VERSION/
+    fi
+done
+mkdir $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+}
+strip_files() {
+find | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find | xargs file | grep "current ar archive" | cut -f 1 -d : | xargs strip -g 2> /dev/null
+gzip -9 usr/man/man?/*.? 2> /dev/null
+}
+
+download_source
+clean_directories
+cd $TMP || exit 1
+explode_archive
+cd $TARBALL || exit 1
+set_permissions
+sed -i '70s|$PREFIX|/usr|' install.sh
+./install.sh $PKG/usr || exit 1
+copy_docs
+cd $PKG || exit 1
+strip_files
+#requiredbuilder -v -y -s $CWD $PKG
+makepkg -l y -c n $CWD/$NAME-$VERSION-$ARCH-$BUILD.txz
+
+echo "MPKG"
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg convert $CWD/$NAME-$VERSION-$ARCH-$BUILD.txz || exit 1
+mpkg -P gendeps2 $CWD/$NAME-$VERSION-$ARCH-$BUILD.txz || exit 1
+mpkg-setmeta $CWD/$NAME-$VERSION-$ARCH-$BUILD.txz \
+  --maintainer-name=$AUTHOR --maintainer-email=$EMAIL --add-tag=games-misc
+mpkg-validate $CWD/$NAME-$VERSION-$ARCH-$BUILD.txz
+
+cd $CWD
+tar vczf $NAME-$VERSION-$BUILD.tar.gz slack-desc $NAME.SlackBuild
+
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*

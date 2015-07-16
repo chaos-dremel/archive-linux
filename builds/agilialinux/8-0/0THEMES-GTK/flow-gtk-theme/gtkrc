@@ -1,0 +1,139 @@
+# Theme: Flow
+# Author: Twilight in Zero (Trent M.)
+# Based on Shiki-Colors by perfectska04 (Victor C.)
+# Description: A smooth, slick, completely modular GTK theme.
+# 100% free and open source.
+
+# NOTE: Uncommenting means to delete the "#" at the beginning of a line.
+# Commenting means to add a "#" at the beginning of a line. The "#" tells the
+# theme to ignore everything after it on that line. This is the primary method
+# of customization: turning each module off/on via commenting/uncommenting.
+
+
+###############
+# GTK OPTIONS
+# Standard theme options.
+###############
+
+# These are the defined colors for the theme, you can change them in GNOME's
+# appearance preferences. Except maybe the dark colors and the Chrome frame
+# colors. XFCE users like me, you gotta do it by hand here.
+gtk_color_scheme = "selected_bg_color:#3fa1d1\nselected_fg_color:#ffffff"  # selected colors
+gtk_color_scheme = "bg_color:#d6d6d6\nfg_color:#101010"                    # bg, fg
+gtk_color_scheme = "base_color:#ffffff\ntext_color:#1a1a1a"                # base, text
+gtk_color_scheme = "tooltip_bg_color:#f5f5b5\ntooltip_fg_color:#000000"    # tooltips
+gtk_color_scheme = "dark_bg_color:#3c3c3c\ndark_fg_color:#e6e6e6"          # dark
+gtk_color_scheme = "frame_color:#313131\ninactive_frame_color:#313131"     # for Chrome/ium
+
+# These are the defined sizes for the icons. XFCE's IconSize xfconf key
+# typically overrides this in certain apps, so it needs to be set there
+# too when using this theme.
+gtk-icon-sizes = "panel=16,16:gtk-menu=16,16:gtk-button=16,16:gtk-small-toolbar=24,24:gtk-large-toolbar=24,24:panel-menu=16,16"
+
+# Removes mnemonics.
+gtk-enable-mnemonics = 0
+
+# No text in toolbars.
+gtk-toolbar-style = 0
+
+
+################
+# BASE MODULES
+# Don't touch, or clowns will eat you.
+################
+
+include "modules/theme-default.rc"
+include "modules/theme-general.rc"
+include "modules/theme-specific.rc"
+
+
+##########################
+# PRIMARY CUSTOMIZATIONS
+# If you look into these modules, you'll find that they take advantage of
+# the fact that if there are multiple styles with the same name, they get
+# merged together. The merged style is then used in the matching phase.
+#
+# Select only one item under each section.
+##########################
+
+# Buttons, Treeview Headers, Sliders     |  Default: smooth, standard gradient
+#include "modules/light-glossy.rc"                # Enable gloss.
+#include "modules/light-invert.rc"                # Invert gradient.
+#include "modules/light-glossy-invert.rc"         # Enable gloss and invert gradient.
+
+# Checks, Radios, Progress bars          |  Default: smooth, standard gradient
+#include "modules/selected-glossy.rc"             # Enable gloss.
+#include "modules/selected-invert.rc"             # Invert gradient.
+include "modules/selected-glossy-invert.rc"      # Enable gloss and invert gradient.
+
+# Slider shape                           |  Default: pill shaped with handle
+#include "modules/sliders-bullet.rc"              # Bullet shaped, no handle.
+#include "modules/sliders-light.rc"               # Ubuntu Light style, small handle.
+
+# Scrollbars                             |  Default: faded trough, external
+#include "modules/scrollbars-elementary.rc"       # Elementary scrollbars.
+
+# Treeviews                              |  Default: standard gradient
+#include "modules/treeviews-invert.rc"            # Invert gradient on treeviews.
+
+# Menus                                  |  Default: normal, flat, blended.
+#include "modules/menus-gradient.rc"              # Gradient menus with normal colors.
+#include "modules/menus-light.rc"                 # Light gradient menus.
+include "modules/menus-dark.rc"                  # Dark gradient menus.
+#include "modules/menus-sel.rc"                   # Selected gradient menus.
+
+# Selected menu items                    |  Default: smooth, standard gradient
+include "modules/menusel-glossy.rc"              # Enable gloss on menu items.
+#include "modules/menusel-invert.rc"              # Invert gradient on menu items.
+#include "modules/menusel-glossy-invert.rc"       # Invert gradient on menu items.
+
+# Popup menus                            |  Default: follows menu style
+#include "modules/menus-popup-base.rc"            # Mac OS style popup menus.
+
+# Toolbars                               |  Default: normal, flat, blended.
+#include "modules/toolbars-gradient.rc"           # Gradient toolbars with normal colors.
+#include "modules/toolbars-light.rc"              # Light gradient toolbars.
+#include "modules/toolbars-dark.rc"               # Dark gradient toolbars.
+#include "modules/toolbars-sel.rc"                # Selected gradient toolbars.
+
+# Panels                                 |  Default: standard colors
+#include "modules/panels-light.rc"                # Makes panels light.
+include "modules/panels-dark.rc"                 # Makes panels dark.
+#include "modules/panels-sel.rc"                  # Gives panels the selected bg color.
+
+# Panel bg pixmap                        |  Default: none
+# Note that the included pixmap is meant for dark panels at 26px height.
+# Open the module for info on an easy way to make new pixmaps.
+include "modules/panels-pixmap.rc"               # Sets bg to modules/panel-pixmap.png.
+
+# Decorations                            |  Default: standard colors
+#include "modules/decorations-normal-sel.rc"      # Sets normal colors to selected colors.
+#include "modules/decorations-sel-normal.rc"      # Sets selected colors to normal colors.
+#include "modules/decorations-dark.rc"            # Makes window decorations dark.
+#include "modules/decorations-sel-dark.rc"        # Sets selection color to dark too.
+
+
+##########################
+# MATCHING / WORKAROUNDS
+# Don't touch, or clowns will eat you.
+##########################
+
+include "modules/theme-matching.rc"
+include "modules/theme-workarounds.rc"
+
+
+########################
+# EXTRA CUSTOMIZATIONS
+# Extra little features for the theme.
+########################
+
+include "modules/extra-panels-bold-menu.rc"      # Gives panel menus bold text.
+include "modules/extra-xfdesktop.rc"             # Enhancements to xfdesktop.
+include "modules/extra-xfce4-panel.rc"           # Enhancements to xfce4-panel.
+#include "modules/extra-thunar-elementary.rc"     # Makes Thunar look like Nautilus-Elementary.
+# Thunar-Elementary is disabled by default because it requires a modified
+# version of Thunar. See the module file for more info.
+
+
+# The answer to the ultimate question of life, the universe, and everything is
+# OVER NINE THOUSAAAAAAAAAAAAND!!!

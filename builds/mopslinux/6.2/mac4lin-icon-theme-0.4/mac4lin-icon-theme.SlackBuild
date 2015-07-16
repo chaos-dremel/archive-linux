@@ -1,0 +1,96 @@
+#!/bin/sh
+
+# Slackware build script for Mac4Lin ver.0.4 GTK Icon Theme  
+
+# Copyright 2009 NK <nk-man@yandex.ru>
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+PRGNAM=mac4lin-icon-theme
+VERSION=${VERSION:-0.4}
+ARCH=noarch
+BUILD=${BUILD:-1}
+
+SRCPRG=Mac4Lin_Icons_v0.4
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-$CWD}
+
+SRCARC=Mac4Lin_Icons_Part2_v0.4
+ARC=${ARC:-tar.gz}
+SRC=http://sunet.dl.sourceforge.net/project/mac4lin/mac4lin/ver.0.4/$SRCARC.$ARC 
+if [ ! -e $SRCARC.$ARC ]; then
+	wget -c $SRC
+fi
+
+set -e
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+mkdir -p $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+tar xvf $CWD/$SRCARC.tar.?z* || exit 1
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+cd $SRCPRG
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/slack-desc > $PKG/usr/doc/$PRGNAM-$VERSION/slack-desk
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/usr/share/icons/$SRCPRG
+cp -a * $PKG/usr/share/icons/$SRCPRG
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+#cat $CWD/doinst.sh > $PKG/install/doinst.sh
+cat $CWD/postremove.sh > $PKG/install/postremove.sh
+
+cd $PKG
+
+#if [ ! -e $CWD/slack-required ]; then
+#    echo "Generating dependencies. This make take a few minutes to complete."
+#    requiredbuilder -v -y -s $CWD $PKG
+#else
+#    cat $CWD/slack-required > $PKG/install/slack-required
+#fi
+
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+
+echo "MPKG"
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg convert $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg -P gendeps2 $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg-setmeta $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz \
+  --maintainer-name=$AUTHOR --maintainer-email=$EMAIL --add-tag=icons
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz
+echo "Package Complete"
+
+cd $CWD
+tar vczf $PACKAGE_NAME-$VERSION-$BUILD.tar.gz slack-desc $PACKAGE_NAME.SlackBuild *.sh
+
+#echo "delete build garbage"
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*
+
+echo "DONE"

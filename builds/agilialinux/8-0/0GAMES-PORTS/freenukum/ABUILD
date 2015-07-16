@@ -1,0 +1,85 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=freenukum
+pkgver=0.2.10
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Freenukum Jump'n Run game"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("The Freenukum Jump'n Run game is a clone of the old EGA graphics based 2D game Duke Nukem. It uses the original Duke Nukem level and graphics files."
+""
+"Licenses: GNU GPL v3."
+""
+"Homepage: https://launchpad.net/freenukum"
+)
+
+source=("http://launchpad.net/freenukum/trunk/0.2/+download/freenukum-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="games games-arcade"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+#before_build()
+#{
+#echo ""
+#}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix="
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+cd ${pkgdir}/usr/doc/${pkgname}-${pkgver}
+ if [ -f ./doc/*.6 ]; then
+	rm -rfv ./doc || exit 1
+ fi
+
+}

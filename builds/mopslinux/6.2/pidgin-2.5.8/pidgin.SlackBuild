@@ -1,0 +1,122 @@
+#!/bin/sh
+# Copyright Loris Vincenzi (http://www.slacky.eu)
+# All rights reserved.
+#
+# Heavily based on the Slackware 12.2 SlackBuild
+# http://gaim.sourceforge.net/
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Modified for MOPSLinux <www.mopslinux.org> by NK <nk-man@yandex.ru>
+
+CWD=`pwd`
+TMP=${TMP:-/tmp/pkg/slacky.eu}
+PKG=$TMP/package-pidgin
+NAME=pidgin
+PRGNAM=$NAME
+VERSION=2.5.8
+ARCH=${ARCH:-i686}
+BUILD=1nk
+
+if [ "$ARCH" = "i386" ]; then
+  SLKCFLAGS="-O2 -march=i386 -mcpu=i686"
+elif [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2"
+elif [ "$ARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2"
+fi
+
+SRCVER=$VERSION
+ARC=${ARC:-tar.bz2}
+SRC=http://downloads.sourceforge.net/project/pidgin/Pidgin/2.5.8/pidgin-2.5.8.tar.bz2
+if [ ! -e $PRGNAM-$SRCVER.$ARC ]; then
+	wget -c $SRC
+fi
+
+if [ ! -d $TMP ]; then
+ mkdir -p $TMP
+fi
+if [ ! -d $PKG ]; then
+ mkdir -p $PKG
+fi
+
+cd $TMP
+tar xjvf $CWD/$NAME-$VERSION.tar.bz2
+cd $NAME-$VERSION
+find . \( -perm 777 -o -perm 775 -o -perm 711 \) -exec chmod 755 {} \;
+find . \( -perm 700 -o -perm 555 -o -perm 511 \) -exec chmod 755 {} \;
+find . \( -perm 666 -o -perm 664 -o -perm 600 \) -exec chmod 644 {} \;
+find . \( -perm 444 -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+chown -R root:root .
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+--sysconfdir=/etc \
+--mandir=/usr/man \
+--disable-meanwhile \
+
+make || exit 1
+make install DESTDIR=$PKG || exit 1
+mkdir -p $PKG/usr/doc/$NAME-$VERSION
+cp -a AUTHORS COPYING COPYRIGHT ChangeLog* HACKING INSTALL NEWS PLUGIN_HOWTO README* $PKG/usr/doc/$NAME-$VERSION
+sed -i "s|Icon=pidgin|Icon=/usr/share/icons/hicolor/48x48/apps/pidgin.png|g" $PKG/usr/share/applications/pidgin.desktop
+
+cd $PKG
+find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+find $PKG/usr/man -type f -exec gzip -9 {} \;
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+#requiredbuilder -v -y -s $CWD $PKG
+makepkg -l y -c n $CWD/$NAME-$VERSION-$ARCH-$BUILD.tgz
+
+# MPKG
+cd $CWD
+mkdir -p $PKG/usr/src/SlackBuilds
+tar Jcf $PKG/usr/src/SlackBuilds/${PRGNAM}.build_tree.tar.xz \
+	--ignore-failed-read --owner=root --group=root --mode=644 \
+	$PRGNAM.SlackBuild slack-desc *.sh.gz *.sh *.desktop
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg-setmeta $PKG --keep-symlinks --name=${PACKAGE_NAME} \
+	--maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+	--version=${VERSION} --arch=${ARCH} --build ${BUILD} \
+	--add-tag=net-im --add-tag=xapps
+mpkg -P -G gendeps2 $PKG
+
+cd $PKG
+/sbin/makepkg -l y -c n -p $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.t?z
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*
+
+cd $CWD
+rm -f $PRGNAM-$SRCVER.$ARC $PRGNAM-$VERSION-$ARCH-$BUILD.txz.validate
+
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP
+fi

@@ -1,0 +1,87 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=colorcode
+pkgver=0.6.1
+pkgbuild=1
+arch=('auto')
+
+shortdesc="advanced MasterMind game and solver"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("ColorCode is a free advanced MasterMind clone with lots of different game"
+	  "variants, from the very easy up to really challenging ones."
+""
+	  "Homepage: http://colorcode.laebisch.com/"
+)
+
+source=("http://colorcode.laebisch.com/download/ColorCode-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="games games-puzzle"     	#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/ColorCode #$pkgname-$pkgver
+
+burn_patches
+
+qmake
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+make -j${numjobs} || exit 1
+
+mkdir -p ${pkgdir}/usr/bin/
+cp -a ./colorcode ${pkgdir}/usr/bin/colorcode || exit 1
+
+mkdir -p ${pkgdir}/usr/share/{applications,pixmaps} || exit 1
+
+cat << EOF > ${pkgdir}/usr/share/applications/colorcode.desktop
+[Desktop Entry]
+Name=ColorCode
+GenericName=MasterMind-like game
+Comment=MasterMind-like game
+Exec=/usr/bin/colorcode
+Icon=/usr/share/pixmaps/cc64.png
+Terminal=false
+Type=Application
+Categories=Qt;Game;LogicGame;
+EOF
+
+cp -a ./img/cc64.png ${pkgdir}/usr/share/pixmaps/cc64.png || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

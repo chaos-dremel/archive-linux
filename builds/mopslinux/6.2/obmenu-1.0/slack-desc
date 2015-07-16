@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+      |-----handy-ruler------------------------------------------------------|
+obmenu: obmenu (openbox menu editor)
+obmenu:
+obmenu: Obmenu is a menu editor designed for openbox.  It's easy to use,
+obmenu: allowing to get the most out of the powerful Openbox menu system,
+obmenu: while hiding the XML layout from the user.  It also (optionally)
+obmenu: installs a bunch of dynamic menus (pipe menus), such as Gnome menus
+obmenu: or a quick-navigator.  You can also use the obxml module to easily
+obmenu: write pipe menus of your own in Python.
+obmenu:
+obmenu: Learn more at: http://obmenu.sourceforge.net
+obmenu:

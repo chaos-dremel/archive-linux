@@ -1,0 +1,78 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=xfburn-nothunar
+pkgver=0.4.3
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Приложение для записи CD и DVD"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Xfburn is a simple CD/DVD burning tool based on libburnia libraries. It"
+	  "can blank CD/DVD(-RW)s, burn and create iso images, audio CDs, as well as"
+	  "burn personal compositions of data to either CD or DVD."
+""
+	  "Warning! Xfburn-nothunar - xfburn with no thunar dependencies."
+""
+	  "Homepage: http://www.xfce.org/projects/xfburn/"
+)
+
+source=("git:http://git.xfce.org/git/apps/xfburn")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="xfce app-cdr"     		#short and long tags / длинный и короткий тег
+build_deps="linuxdoc-tools" 			#work only in MOPS
+
+provides="xfburn"
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./autogen.sh --prefix=/usr \
+--sysconfdir=/etc --libexecdir=/usr/lib \
+--localstatedir=/var --disable-static \
+	--disable-thunar-vfs \
+	--enable-gstreamer \
+	--enable-dbus \
+	--enable-hal
+
+make -j${numjobs} || exit 1
+make install DESTDIR=$startdir/pkg || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

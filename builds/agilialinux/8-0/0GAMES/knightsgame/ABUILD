@@ -1,0 +1,103 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=knightsgame
+pkgver=015
+pkgbuild=1
+arch=('auto')
+
+shortdesc="a multiplayer action game involving several knights"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Knights is a multiplayer game in which players must explore dungeons, fight vampire bats, zombies and each other, and try to complete a given quest. The first player to complete the quest is the winner."
+"
+Knights is based on the Amiga game of the same name made in 1994. Compared to the original, several new features have been added, including Internet and LAN game modes, support for more than two players, quest time limits, etc."
+""
+"Homepage: http://www.knightsgame.org.uk"
+
+)
+
+source=("http://www.knightsgame.org.uk/files/knights_${pkgver}_src.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="games games-action"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+numjobs=2
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+
+icon_desktop(){
+	echo "Icon"
+	mkdir -p $pkgdir/usr/share/applications/ || exit 1
+	cat << EOF > $pkgdir/usr/share/applications/${pkgname}.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Knights
+Comment=a game of multi-player violent dungeon bashing
+Exec=${pkgname}
+TryExec=/usr/bin/${pkgname}
+Categories=Application;Game;RolePlaying
+Icon=/usr/doc/${pkgname}-${pkgver}/manual/images/potion.png
+EOF
+}
+icon_desktop
+
+}
+
+build()
+{
+go_src_dir
+burn_patches
+
+make -j${numjobs} PREFIX=/usr \
+	DOC_DIR=/usr/doc/${pkgname}-${pkgver} \
+	DATA_DIR=/usr/share/${pkgname} \
+	KNIGHTS_BINARY_NAME=${pkgname} \
+	SERVER_BINARY_NAME=${pkgname}_server || exit 1
+
+make PREFIX=$pkgdir/usr \
+	DOC_DIR=$pkgdir/usr/doc/${pkgname}-${pkgver} \
+	DATA_DIR=$pkgdir/usr/share/${pkgname} \
+	KNIGHTS_BINARY_NAME=${pkgname} \
+	SERVER_BINARY_NAME=${pkgname}_server \
+	install || exit 1
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

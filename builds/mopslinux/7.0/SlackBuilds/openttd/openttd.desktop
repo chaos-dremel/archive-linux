@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Version=1.1
+Name=OpenTTD
+Name[ru]=OpenTTD
+Comment=A clone of Transport Tycoon Deluxe
+Comment[ru]=Клон Transport Tycoon Deluxe
+Icon=openttd
+Exec=openttd
+Terminal=false
+Categories=Game;StrategyGame;

@@ -1,0 +1,23 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+     |-----handy-ruler------------------------------------------------------|
+idesk: программа отображения иконок на рабочем столе
+idesk: 
+idesk: iDesk — утилита, работающая на платформах GNU/Linux и FreeBSD, которая
+idesk:  служит для отображения иконок на рабочем столе. Предназначена для слу
+idesk: чаев, когда оконный менеджер самостоятельно этого делать не умеет (bla
+idesk: ckbox, fluxbox и др.).
+idesk: 
+idesk: Idesk отображает иконки с кратким описанием на рабочем столе и позволя
+idesk: ет выполнять запуск любых X-приложений. Размеры иконок могут быть изме
+idesk: нены, используются всплывающие окна и прозрачность с другими красивыми
+idesk:  эффектами. Понимает множество типов форматов картинок таких как PNG, 
+idesk: JPG, GIF, XPM, прочее. Idesk также позволяет назначать разные действия
+idesk:  на каждую кнопку мыши. 
+idesk: 
+idesk: http://idesk.sourceforge.net/

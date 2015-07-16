@@ -1,0 +1,118 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=swt
+pkgver=3.6.2
+pkgbuild=2
+arch=('auto')
+
+shortdesc="SWT: The Standard Widget Toolkit"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("SWT is an open source widget toolkit for Java designed to provide efficient, portable access to the user-interface facilities of the operating systems on which it is implemented. Homepage: http://www.eclipse.org/swt"
+)
+
+_date=201102101200
+
+if [ "${ARCH}" == "x86_64" ]; then
+ source=("http://download.eclipse.org/eclipse/downloads/drops/R-${pkgver}-${_date}/swt-${pkgver}-gtk-linux-x86_64.zip n")
+else
+ source=("http://download.eclipse.org/eclipse/downloads/drops/R-${pkgver}-${_date}/swt-${pkgver}-gtk-linux-x86.zip n")
+fi
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="dev-java libs"
+
+#dependencies only needed to build package
+build_deps="apache-ant jdk"
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs="$srcdir/about.html"
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+#before_build()
+#{
+#echo ""
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+#  cd "${srcdir}"
+#  . /etc/profile.d/jdk.sh
+#  . /etc/profile.d/apache-ant.sh
+
+  unzip -jqo ${srcache}/swt-${pkgver}-gtk-linux-*.zip "*src.zip" || exit 1
+  unzip -qo src.zip || exit 1
+  rm -rfv about_files || exit 1
+  mkdir src
+  mv org src/ || exit 1
+
+# build-swt.xml
+cp $filedir/build-swt.xml build.xml || exit 1
+
+    [ "${ARCH}" = "x86_64" ] && export SWT_PTR_CFLAGS=-DSWT_PTR_SIZE_64
+
+# Big thx Arch linux
+
+  make -f make_linux.mak make_awt || exit 1
+  make -f make_linux.mak make_swt || exit 1
+  make -f make_linux.mak make_atk || exit 1
+
+# w/o GNOME (libgnomeui-2.0)
+#  make -f make_linux.mak make_gnome || exit 1
+
+  export MOZILLA_INCLUDES="`pkg-config --cflags libxul`"
+  export MOZILLA_LIBS="-Wl,-R`pkg-config libxul --variable=libdir` `pkg-config libxul --libs`"
+  export XULRUNNER_INCLUDES="${MOZILLA_INCLUDES}"
+  export XULRUNNER_LIBS="${MOZILLA_LIBS}"
+#  make -f make_linux.mak make_mozilla || exit 1
+  make -f make_linux.mak make_xulrunner || exit 1
+
+  make -f make_linux.mak make_cairo || exit 1
+  make -f make_linux.mak make_glx || exit 1
+ 
+  ant compile || exit 1
+  cp version.txt build/version.txt
+  cp src/org/eclipse/swt/internal/SWTMessages.properties build/org/eclipse/swt/internal/
+
+  ant jar || exit 1
+
+  install -m755 -d "${pkgdir}/usr/share/java"
+  install -m755 -d "${pkgdir}/usr/lib${LIBDIRSUFFIX}"
+
+  install -m644 swt.jar "${pkgdir}/usr/share/java/" || exit 1
+  install -m755 *.so "${pkgdir}/usr/lib${LIBDIRSUFFIX}/" || exit 1
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

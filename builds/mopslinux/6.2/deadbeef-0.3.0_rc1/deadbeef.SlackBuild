@@ -1,0 +1,121 @@
+#!/bin/sh
+
+# Slackware build script for DeaDBeeF
+
+# Copyright 2009 NK <nk-man@yandex.ru>
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+PRGNAM=deadbeef
+VERSION=0.3.0_rc1
+ARCH=${ARCH:-i686}
+BUILD=${BUILD:-1}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+fi
+
+set -e
+
+SRCVER=0.3.0-rc1
+#ARC=${ARC:-tar.bz2}
+#ARC=${ARC:-zip}
+ARC=${ARC:-tar.gz}
+#ARC=${ARC:-tgz}
+SRC=http://downloads.sourceforge.net/project/deadbeef/$PRGNAM-$SRCVER.$ARC
+if [ ! -e $SRC=$PRGNAM-$SRCVER.$ARC ]; then
+	wget -c $SRC
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+cd $TMP
+tar xvf $CWD/$PRGNAM-$SRCVER.tar.?z* || exit 1
+cd $PRGNAM-$SRCVER
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+# Configure:
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+	./configure \
+      --prefix=/usr \
+      --docdir=/usr/doc
+
+# Build and install:
+make -j2 || make || exit 1
+make install DESTDIR=$PKG || exit 1
+
+# Strip binaries:
+find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+# Add a documentation directory:
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a ChangeLog $PKG/usr/doc/$PRGNAM-$VERSION/
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+chmod 644 $PKG/usr/doc/$PRGNAM-$VERSION/*
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $PKG
+
+#if [ ! -e $CWD/slack-required ]; then
+#    echo "Generating dependencies. This make take a few minutes to complete."
+#    requiredbuilder -v -y -s $CWD $PKG
+#else
+#    cat $CWD/slack-required > $PKG/install/slack-required
+#fi
+
+/sbin/makepkg -l y -c n $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+
+# for MOPSLinux <www.mopslinux.org>
+echo "MPKG"
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+###recommended tags:
+# print base-utils audio docs desktop x11-fonts virtual multimedia utils
+# devel kde i18n koffice libs network opeoffice server xapps games
+# science drivers proprietary education xfce wm graphics
+###
+mpkg convert $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg -P gendeps2 $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg-setmeta $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz \
+--maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+--add-tag=audio --add-tag=xapps
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz
+
+cd $CWD
+tar vczf $PACKAGE_NAME-$VERSION-$BUILD.tar.gz slack-desc $PACKAGE_NAME.SlackBuild
+#tar vczf $CWD/$PRGNAM-$VERSION-$BUILD.tar.gz slack-desc $PRGNAM.SlackBuild slack-required
+
+echo "delete build garbage"
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*
+
+echo "DONE"

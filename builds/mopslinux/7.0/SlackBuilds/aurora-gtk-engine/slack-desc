@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+   
+                 |-----handy-ruler------------------------------------------------------|
+aurora-gtk-engine: Aurora Gtk Engine (GTK 2.x Theme/Style)
+aurora-gtk-engine:
+aurora-gtk-engine: The Aurora Gtk Engine themes all common Gtk widgets to provide an 
+aurora-gtk-engine: attractive, complete and consistent look for Gtk applications.
+aurora-gtk-engine: License: GPL.
+aurora-gtk-engine: 
+aurora-gtk-engine: http://gnome-look.org/
+aurora-gtk-engine:
+aurora-gtk-engine:
+aurora-gtk-engine:
+aurora-gtk-engine:

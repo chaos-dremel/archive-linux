@@ -1,0 +1,81 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=qlwm
+pkgver=4.3
+pkgbuild=1
+arch=('auto')
+
+shortdesc="A Qt based window manager"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("qlwm is yet another window manager for the X11 system. Because it makes heavy use of a high level API it can be kept small, stable and easy to maintain. One of the design rules was to get a non-intrusive environment that does not bother the user with unnecessary details or features while providing comfort and high functionality. Homepage: http://www.alinden.mynetcologne.de/qlwm/"
+)
+
+source=("http://www.alinden.mynetcologne.de/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="xapps x11-wm"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+
+sed -i "s#/usr/local/bin/qlwm#$pkgdir/usr/bin/qlwm#" Makefile
+
+make DEST=/usr/share/qlwm MANPATH=/usr/share/man QMAKE=qmake || return 1
+  
+  install -d -m755 "$pkgdir/usr/share/man/man1"
+  install -d -m755 "$pkgdir/usr/bin"
+  install -d -m755 "$pkgdir/etc/qlwm"
+
+make DEST="$pkgdir/usr/share/qlwm" MANPATH="$pkgdir/usr/share/man" install || return 1
+
+#do some cleaning up for hardcoded symlinks
+ln -sf /usr/share/qlwm/qlwm "$pkgdir/usr/bin/qlwm"
+
+  for i in defaults appdefaults menuconfig; \
+     do cp  -v files/$i $pkgdir/etc/qlwm; \
+  done
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

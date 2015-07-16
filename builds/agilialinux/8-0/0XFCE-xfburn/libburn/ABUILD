@@ -1,0 +1,80 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=libburn
+pkgver=1.1.0.pl01
+pkgbuild=1
+arch=('auto')
+
+shortdesc="a library by which preformatted data get onto optical media: CD, DVD, BD"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("libburn is a library by which preformatted data get onto optical media: CD, DVD, BD (Blu-Ray). On Linux it uses either /dev/sgN (on kernel 2.4 with ide-scsi) or /dev/srM , /dev/hdX ( on kernel 2.6). libburn also offers a facility for reading data blocks from its drives without using the normal block device i/o, which has its advantages and disadvantages. It seems appropriate, nevertheless, to do writing and reading via the same channel. On several Linux systems, the block device driver needs reloading of the drive tray in order to make available freshly written data. The libburn read function does not need such a reload. The code of libburn is independent of cdrecord. Homepage: http://libburnia-project.org"
+)
+
+source=("http://files.libburnia-project.org/releases/${pkgname}-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="libs dev-libs"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+BUILD_SYSTEM="autotools"
+
+BUILD_WORD="LDFLAGS=\"$SLKLDFLAGS\" CFLAGS=\"$SLKCFLAGS\" CXXFLAGS=\"$SLKCFLAGS\" ./configure"
+
+BUILD_KEYS="--prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix="
+
+INSTALL_KEYS="DESTDIR=$pkgdir"
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+if [ -d ${pkgdir}/usr/doc/${pkgname}-${pkgver}/doc ]; then
+ rm -rfv ${pkgdir}/usr/doc/${pkgname}-${pkgver}/doc
+fi
+
+}

@@ -1,0 +1,73 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=leo-like-smplayer-theme
+pkgver=8.5
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="leo-like-smplayer"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("http://kde-look.org/content/show.php/leo-like-smplayer?content=125172"
+)
+
+source=("http://kde-look.org/CONTENT/content-files/125172-leo_8.5.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="x11-themes themes"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep="smplayer"
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+go_src_dir
+
+mkdir -p $startdir/pkg/usr/share/smplayer/themes/leo-like
+cp -a * $startdir/pkg/usr/share/smplayer/themes/leo-like || exit 1
+rm -fv $startdir/pkg/usr/share/smplayer/themes/leo-like/README.txt
+}

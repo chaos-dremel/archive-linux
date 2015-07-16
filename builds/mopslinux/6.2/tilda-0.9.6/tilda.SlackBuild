@@ -1,0 +1,96 @@
+#!/bin/sh
+
+# Slackware build script for tilda
+# Written by Erik Hanson  erik@slackbuilds.org
+# Modified by the SlackBuilds.org project
+# Modified for MOPSLinux <www.mopslinux.org> by NK <nk-man@yandex.ru>
+
+PRGNAM=tilda
+VERSION=0.9.6
+ARCH=${ARCH:-i686}
+BUILD=${BUILD:-1}
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-$CWD}
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+fi
+
+SOURCE=http://downloads.sourceforge.net/project/$PRGNAM/$PRGNAM/$PRGNAM-$VERSION/$PRGNAM-$VERSION.tar.gz
+if [ ! -e $PRGNAM-$VERSION.tar.gz ]; then
+	wget -c $SOURCE
+fi
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+cd $TMP || exit 1
+rm -rf $PRGNAM-$VERSION
+tar xvf $CWD/$PRGNAM-$VERSION.tar.gz || exit 1
+cd $PRGNAM-$VERSION || exit 1
+chown -R root:root .
+chmod -R u+w,go+r-w,a-s .
+
+CFLAGS="$SLKCFLAGS" \
+./configure \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  || exit 1
+
+make || exit 1
+make install-strip DESTDIR=$PKG || exit 1
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a AUTHORS COPYING ChangeLog INSTALL NEWS README TODO \
+  $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+cat $CWD/doinst.sh > $PKG/install/doinst.sh
+
+cd $PKG
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.tgz
+
+
+echo "MPKG"
+  AUTHOR=${AUTHOR:-NK}
+  EMAIL=${EMAIL:-nk-man@yandex.ru}
+PACKAGE_NAME=$PRGNAM
+TAGS=utils,xapps,
+
+  mpkg convert $CWD/$PACKAGE_NAME-$VERSION$SVN-$ARCH-$BUILD.tgz || exit 1
+  mpkg -P gendeps2 $CWD/$PACKAGE_NAME-$VERSION$SVN-$ARCH-$BUILD.tgz || exit 1
+  TAGZ=""
+  for tag in ${TAGS//,/ } ;
+  do
+  TAGZ+="--add-tag=$tag "
+  done
+  if [ -e $CWD/CHANGELOG ]; then
+      TAGZ+="--changelog=$CWD/CHANGELOG "
+  fi
+ 
+  if [ -e $CWD/ADD-DEP ]; then
+      for dep in `cat $CWD/ADD-DEP` ;
+      do
+          TAGZ+="--add-dep=$dep "
+      done
+  fi
+  if [ -e $CWD/REMOVE-DEP ]; then
+      for rd in `cat $CWD/REMOVE-DEP` ;
+      do
+          TAGZ+="--remove-dep=$rd "
+      done
+  fi
+ 
+  mpkg-setmeta $CWD/$PACKAGE_NAME-$VERSION$SVN-$ARCH-$BUILD.tgz --maintainer-name=$AUTHOR --maintainer-email=$EMAIL $TAGZ
+  mpkg-validate $CWD/$PACKAGE_NAME-$VERSION$SVN-$ARCH-$BUILD.tgz
+
+cd $CWD
+tar vczf $PRGNAM-$VERSION-$BUILD.tar.gz slack-desc $PRGNAM.SlackBuild doinst.sh
+
+echo "DONE"

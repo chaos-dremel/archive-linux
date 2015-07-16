@@ -1,0 +1,16 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+      |-----handy-ruler------------------------------------------------------|
+obconf: Preferences manager for Openbox window manager
+obconf: 
+obconf: ObConf is a small graphical utility which configures the window manage
+obconf: r Openbox' preferences and configuration settings on the fly.
+obconf: 
+obconf: If you are an Openbox user, you may want this package.
+obconf: 
+obconf: http://icculus.org/openbox/index.php/ObConf:About

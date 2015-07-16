@@ -1,0 +1,116 @@
+#!/bin/sh
+
+# Slackware build script for EasyTAG
+
+# Copyright 2010 NK <nk-man@yandex.ru>
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+PRGNAM=easytag
+VERSION=2.1.6
+ARCH=${ARCH:-i686}
+BUILD=${BUILD:-2}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+
+if [ "$ARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+fi
+
+set -e
+
+SRCVER=$VERSION
+ARC=${ARC:-tar.bz2}
+SRC=http://downloads.sourceforge.net/project/easytag/easytag%20unstable%20%28gtk%202%29/$VERSION/$PRGNAM-$VERSION.$ARC
+if [ ! -e $PRGNAM-$VERSION.$ARC ]; then
+	wget -c $SRC
+fi
+
+DOC="COPYING ChangeLog* INSTALL README TODO USERS-GUIDE THANKS \
+	doc/EasyTAG_Documentation.html doc/id3 doc/vorbis"
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+cd $TMP
+rm -rf $PRGNAM-$SRCVER
+tar xvf $CWD/$PRGNAM-$SRCVER.tar.?z* || exit 1
+cd $PRGNAM-$SRCVER
+chown -R root:root .
+chmod -R a-s,u+w,go+r-w .
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+	./configure \
+      --prefix=/usr \
+      --disable-static \
+      --mandir=/usr/man \
+      --sysconfdir=/etc \
+      --localstatedir=/var \
+      --docdir=/usr/doc/$PRGNAM-$VERSION \
+      || exit 1
+
+make -j2 || make || exit 1
+make install DESTDIR=$PKG || exit 1
+
+find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+
+if [ -d $PKG/usr/man ]; then
+	gzip -9 $PKG/usr/man/man?/*.? 
+fi
+
+if [ -d $PKG/usr/share/man ]; then
+	gzip -9 $PKG/usr/share/man/man?/*.?
+fi
+
+if [ ! -d $PKG/usr/doc/$PRGNAM-$VERSION ]; then
+	mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+fi
+cp -a $DOC $PKG/usr/doc/$PRGNAM-$VERSION/
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+chmod 644 $PKG/usr/doc/$PRGNAM-$VERSION/*
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# MPKG
+cd $CWD
+mkdir -p $PKG/usr/src/SlackBuilds
+tar Jcf $PKG/usr/src/SlackBuilds/${PRGNAM}.build_tree.tar.xz --ignore-failed-read \
+	$PRGNAM.SlackBuild slack-desc *.sh.gz *.sh *.desktop patches/
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg-setmeta $PKG --keep-symlinks --name=${PACKAGE_NAME} \
+	--maintainer-name=$AUTHOR --maintainer-email=$EMAIL \
+	--version=${VERSION} --arch=${ARCH} --build ${BUILD} \
+	--add-tag=media-sound --add-tag=xapps
+mpkg -P -G gendeps2 $PKG
+
+cd $PKG
+/sbin/makepkg -l y -c n -p $CWD/$PRGNAM-$VERSION-$ARCH-$BUILD.txz
+
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.t?z
+rm -rf $PKG $TMP/$PRGNAM-$SRCVER /tmp/mpkg*

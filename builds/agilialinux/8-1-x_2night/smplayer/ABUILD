@@ -1,0 +1,92 @@
+pkgname=smplayer
+pkgver=0.8.7
+pkgbuild=1
+arch="auto"
+
+shortdesc=("SMPlayer is a GUI media player based on Qt 4, using mplayer as its backend")
+
+#shortdesc=("SMplayer (Qt4 Mplayer front-end)")
+#longdesc=("SMPlayer intends to be a complete front-end for MPlayer, from basic features  like  playing  videos, DVDs, and  VCDs  to more advanced features like support for MPlayer filters and more.")
+
+
+srcver=${pkgver/_/-}
+srctar="${pkgname}-${srcver}.tar.bz2"
+source_tar=("http://downloads.sourceforge.net/smplayer/smplayer-${pkgver}.tar.bz2")
+source_now=("https://subversion.assembla.com/svn/smplayer/smplayer/trunk")
+if [ ! -f $srcache/${srctar} ]; then
+ wget -c -P $srcache $source_tar
+fi
+if [ -f $srcache/${srctar} ]; then
+ source=$source_tar
+else
+ if [ -d $srcache/"$pkgname"_svn ]; then
+  rm -rf $srcache/"$pkgname"_svn
+ fi
+ svn checkout $source_now $srcache/"$pkgname"_svn --trust-server-cert --non-interactive
+ mkdir -p $srcdir && cp -av $srcache/"$pkgname"_svn $srcdir
+ pkgver+=_svn`svn info $srcdir/"$pkgname"_svn | grep Revi | cut -d ":" -f2 | cut -c2-`
+fi
+
+
+tags="xapps media-video"
+
+adddep="MPlayer"
+
+
+before_build(){
+ go_src_dir
+
+ # Fix invalid PNG icons to work with libpng 1.6
+ # http://sourceforge.net/p/smplayer/bugs/571/
+ #find -name '*.png' -exec optipng -quiet -force -fix {} +
+
+ # NO_DEBUG_ON_CONSOLE
+ sed -i 's:#\(DEFINES += NO_DEBUG_ON_CONSOLE\):\1:' src/smplayer.pro
+
+ # Docs
+ smdoc="/share/doc/packages/smplayer"
+ if [ -n "`cat ./Makefile | grep DOC_PATH | grep $smdoc`" ]; then
+  sed -i "/^DOC_PATH=/s|$smdoc|/doc/${pkgname}-${pkgver}|" ./Makefile || exit 1
+ fi
+
+}
+
+
+build() {
+	go_src_dir
+	burn_patches
+
+	set -e
+
+	sed -i "s|translations/smplayer_gl.ts|#translations/smplayer_gl.ts|" \
+		src/smplayer.pro
+ 
+	make PREFIX=/usr -j${numjobs}
+	make PREFIX=/usr DESTDIR=${pkgdir} install
+
+	if [ ! -d ${pkgdir}/usr/share/pixmaps ]; then
+	 install -dm755 ${pkgdir}/usr/share/pixmaps
+	 ln -s /usr/share/icons/hicolor/64x64/apps/smplayer.png ${pkgdir}/usr/share/pixmaps/
+	fi
+
+	sed -i 's|Exec=smplayer %U|Exec=smplayer %F|' \
+		${pkgdir}/usr/share/applications/smplayer.desktop
+
+	sed -i 's|Exec=smplayer -add-to-playlist %U|Exec=smplayer -add-to-playlist %F|' \
+		${pkgdir}/usr/share/applications/smplayer_enqueue.desktop
+
+	set +e
+}
+
+
+after_build(){
+echo ""
+
+#if [[ ! -z `cat ${pkgdir}/usr/share/applications/smplayer_enqueue.desktop | grep "=Добавить в"` ]]; then
+# sed -i \
+#	-e "/^Name\[ru]=/s|Добавить в очередь SMPlayer|SMPlayer Добавить в очередь|" \
+#	-e "/^Name\[uk]=/s|Додати до черги SMPlayer|SMPlayer Додати до черги|" \
+# ${pkgdir}/usr/share/applications/smplayer_enqueue.desktop
+#fi
+
+}

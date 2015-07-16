@@ -1,0 +1,126 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=ubuntu-wallpapers
+pkgver=13.10.0
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="The default Wallpapers for Ubuntu"
+#longdesc=(""
+#)
+
+source=("bzr:lp:${pkgname}"
+"https://launchpad.net/ubuntu/hardy/+source/ubuntu-wallpapers/0.25/+files/ubuntu-wallpapers_0.25.tar.gz"
+"https://launchpad.net/ubuntu/intrepid/+source/ubuntu-wallpapers/0.28.1/+files/ubuntu-wallpapers_0.28.1.tar.gz"
+"https://launchpad.net/ubuntu/jaunty/+source/ubuntu-wallpapers/0.28.4/+files/ubuntu-wallpapers_0.28.4.tar.gz"
+)
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="themes media-wallpapers"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+src_subdir="${srcdir}/ubuntu-wallpapers.src"
+
+build(){
+mkdir -p $pkgdir/usr/share/wallpapers/ubuntu
+mkdir -p ${pkgdir}/usr/doc/${pkgname}-${pkgver}
+
+
+p2j(){
+mv -v "warty-final-ubuntu.png" "warty-final-ubuntu.jpeg"
+}
+
+cpwall(){
+ cd $srcdir/ubuntu-wallpapers${wver}
+ find -name "*.png" -exec cp -arfu {} $pkgdir/usr/share/wallpapers/ubuntu ";" || exit 1
+ find -name "*.jpg" -exec cp -arfu {} $pkgdir/usr/share/wallpapers/ubuntu ";" || exit 1
+ cd $pkgdir/usr/share/wallpapers/ubuntu
+}
+
+cpwall_o(){
+ cd $srcdir/ubuntu-wallpapers${wver}
+ mkdir -p $pkgdir/usr/share/wallpapers/ubuntu/$nver
+ find -name "*.png" -exec cp -arfu {} $pkgdir/usr/share/wallpapers/ubuntu/$nver ";" || exit 1
+ find -name "*.jpg" -exec cp -arfu {} $pkgdir/usr/share/wallpapers/ubuntu/$nver ";" || exit 1
+ cd $pkgdir/usr/share/wallpapers/ubuntu/$nver
+}
+
+cpdoc_o(){
+ cd $srcdir/ubuntu-wallpapers${wver}
+ cp -arfu AUTHORS ${pkgdir}/usr/doc/${pkgname}-${pkgver}/AUTHORS_$nver
+ cd ..
+ rm -rf $srcdir/ubuntu-wallpapers${wver}
+}
+
+# newest
+wver=".src"
+cpwall
+p2j
+
+# Hardy (8.04)
+wver="-0.25"
+nver="8.04-Hardy"
+cpwall_o
+cpdoc_o
+
+# Intrepid (8.10)
+wver="-0.28.1"
+nver="8.10-Intrepid"
+cpwall_o
+p2j
+cpdoc_o
+
+# Jaunty (9.04)
+wver="-0.28.4"
+nver="9.04-Jaunty"
+mv ubuntu-wallpapers ubuntu-wallpapers${wver}
+cpwall_o
+p2j
+cpdoc_o
+
+
+}
+
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+
+#}

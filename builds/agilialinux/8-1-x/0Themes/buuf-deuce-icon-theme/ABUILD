@@ -1,0 +1,366 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=buuf-deuce-icon-theme
+pkgver=1.1_R8
+pkgbuild=4
+arch=('noarch')
+
+shortdesc="BuuF-Deuce-iconset"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Gnome-Buuf-Deuce iconset. Created with DJANY."
+	  ""
+	  "License:"
+	  "Creative Commons Attribution-NonCommercial-ShareAlike 2.5 License."
+	  ""
+	  "Homepage:"
+	  "http://gnome-look.org/content/show.php/BuuF-Deuce-iconset?content=46201"
+)
+
+source=("http://www.deviantart.com/download/73339997/Gnome_Buuf_Deuce_1_1_R8_by_djany.7z")
+wgetopts="--user-agent='wget'"
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="x11-themes themes"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+
+7z e $srcache/Gnome_Buuf_Deuce_1_1_R8_by_djany.7z
+tar xvf ./Buuf-Deuce-1.1-R8.tar.?z* || exit 1
+
+}
+
+build()
+{
+go_src_dir
+burn_patches
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+#find ./ -name *.cache -exec rm -ri {} ";"
+
+cd $srcdir
+mkdir -p $pkgdir/usr/share/icons/
+cp -r ./Buuf-Deuce $pkgdir/usr/share/icons/ || exit 1
+
+# Name
+sed -i 's| 1.1-R8||' $pkgdir/usr/share/icons/Buuf-Deuce/index.theme || exit 1
+#sed -i 's|1.1-R8|NV|' $pkgdir/usr/share/icons/Buuf-Deuce/index.theme || exit 1
+
+###
+
+####
+##
+# 1.1-R8
+# Icon-theme
+##
+####
+
+###
+# action
+#
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/actions
+
+# rotate icon button (4Viewnior)
+mv object-rotate-left.png object-rotate-left.png_
+# right-left
+ln -s undo.png object-rotate-left.png
+ln -s redo.png object-rotate-right.png
+# zoom
+#ln -s stock_search-and-replace.png zoom-fit-best.png
+ln -s preview-file.png zoom-fit-best.png
+# GPicV
+ln -s object-rotate-left.png_ object-flip-horizontal.png
+ln -s up.png object-flip-vertical.png
+
+# GVim-c
+mv gtk-convert.png gtk-convert.png_
+ln -s gtk-execute.png gtk-convert.png
+
+# About gtk-apps
+mv help-about.png help-about.png_
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/gtk-about.png help-about.png
+
+# gtk-cacel
+mv gtk-cancel.png gtk-cancel.png_
+ln -s remove.png gtk-cancel.png
+
+###
+# status
+#
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/status
+ln -s /usr/share/icons/Buuf-Deuce/128x128/status/dialog-warning.png dialog-question.png
+
+###
+# apps
+#
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/apps
+
+# Icon(F1)Menu:Help
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gtk-help.png help-contents.png
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/hint.png help-contents.png
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/xmms.png help-contents.png
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/gtk-dialog-info.png help-contents.png
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/gtk-about.png help-contents.png
+
+## XApps ###
+# opera11_icon
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/opera.png opera-browser.png
+# Smplayer
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gmplayer.png smplayer.png
+# htop
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/utilities-system-monitor.png htop.png
+# screengrab
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/applets-screenshooter.png screengrab.png
+# KChmV
+ln -s gnochm.png kchmviewer.png
+# evince
+mv evince.png evince.png_
+# xpad
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/
+# filezilla
+mv filezilla.png filezilla.png_
+# nitrogen
+ln -s gnome-settings-background.png nitrogen.png
+# leafpad
+ln -s /usr/share/icons/Buuf-Deuce/128x128/emblems/emblem-default.png leafpad.png
+# VBox
+mv VBox.png VBox.png_
+# galculator
+ln -s calc.png galculator.png
+# covergloobus
+#ln -s xmms.png covergloobus.png
+ln -s amarok.png covergloobus.png
+# WINE
+mv wine.png wine.png_
+ln -s gnome-app-install.png wine.png
+# chromium
+ln -s mozilla-icon.png chromium.png
+
+# Agilia/MPKG
+ln -s synaptic.png mpkg-manager2.png
+# guisetup
+#ln -s gnome-other.png guisetup.png
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/stock_attach.png guisetup.png
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/system-software-installer.png guisetup.png
+
+###
+# mimetype
+#
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/mimetypes
+
+# ? swg
+mv www.svg.png svg.png
+
+# Roms
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/application-x-nes-rom.png application-x-snes-rom.png
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/application-x-nes-rom.png application-x-genesis-rom.png
+mv application-x-nes-rom.png application-x-nes-rom.png_
+
+# mp3
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/audio-x-mp3.png gnome-mime-audio-mpeg.png
+ln -s audio.png audio-mpeg.png
+
+# TXZ
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/package-x-generic.png \
+#	gnome-mime-application-x-xz-compressed-tar.png
+
+# README
+ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/application-x-extension-nfo.png text-x-readme.png
+
+# INSTALL
+mv text-x-install.png text-x-install.png_
+ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/application-x-extension-nfo.png text-x-install.png
+
+# office doc
+mv x-office-document.png x-office-document.png_
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/openofficeorg-20-master-document.png x-office-document.png
+cp application-vnd.oasis.opendocument.text.png x-office-document.png
+
+# rtf
+mv application-rtf.png application-rtf.png_
+cp application-msword.png application-rtf.png
+
+# MSWord / OOoWriter
+mv application-msword.png application-msword.png_
+#mv application-x-abiword.png application-x-abiword.png_
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/application-x-abiword.png application-msword.png
+# dark
+ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/application-x-killustrator.png application-msword.png
+mv application-vnd.oasis.opendocument.text.png application-vnd.oasis.opendocument.text.png_
+ln -s openofficeorg-20-oasis-text.png application-vnd.oasis.opendocument.text.png
+
+# unknown File
+mv unknown.png unknown.png_
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/gnome-mime-text-plain.png unknown.png 
+ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/text.png unknown.png
+
+# CD/iso
+mv application-x-cd-image.png application-x-cd-image.png_
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gnome-cd.png application-x-cd-image.png
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gnome-dev-disc-dvdram.png application-x-cd-image.png
+
+# torrent
+#mv application-x-bittorrent.png application-x-bittorrent.png_
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/deluge.png application-x-bittorrent.png
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gnome-unknown.png application-x-bittorrent.png
+
+# image-X-generic
+#mv image-x-generic.png image-x-generic.png_
+#ln -s application-x-killustrator.png image-x-generic.png
+
+# bin
+mv application-x-executable.png application-x-executable.png_
+ln -s /usr/share/icons/Buuf-Deuce/128x128/emblems/emblem-bin.png application-x-executable.png
+#mv gnome-mime-application-x-executable.png gnome-mime-application-x-executable.png_
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/emblems/emblem-bin.png gnome-mime-application-x-executable.png
+#
+ln -s exec.png text-x-script.png
+#ln -s txt.png text-x-script.png
+
+# theme
+#ln -s exec.png gnome-mime-application-x-theme.png
+ln -s /usr/share/icons/Buuf-Deuce/128x128/emblems/emblem-draft.png gnome-mime-application-x-theme.png
+
+# trash~files
+mv application-x-trash.png application-x-trash.png_
+ln -s application-text.png application-x-trash.png
+
+###
+# categories
+#
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/categories
+
+mv applications-development.png applications-development.png_
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gnome-run.png applications-development.png
+
+mv applications-utilities.png applications-utilities.png_
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gnome-settings-default-application.png applications-utilities.png
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/window-new.png applications-utilities.png
+
+mv applications-other.png applications-other.png_
+ln -s applications-utilities.png_ applications-other.png
+
+mv preferences-desktop.png preferences-desktop.png_
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gnome-desktop-config.png preferences-desktop.png
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/system-config-xfree.png preferences-desktop.png
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gnome-settings-default-application.png preferences-desktop.png
+
+mv applications-office.png applications-office.png_
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/gnome-pdf.png applications-office.png
+
+mv preferences-system.png preferences-system.png_
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/system-config-xfree.png preferences-system.png
+
+#
+##
+###
+## 
+# pcmanfm(-git) 
+
+# WinClose
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/actions
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/gtk-close.png window-close.png
+
+# Apps
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/apps
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/system-software-installer.png system-software-install.png
+
+# no/YES
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/stock
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/gtk-ok.png gtk-yes.png
+
+# gtk-dialog-pass
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/status
+ln -s /usr/share/icons/Buuf-Deuce/128x128/apps/stock_keyring.png dialog-password.png
+
+# tab_new
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/actions
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/add.png tab-new.png
+
+###
+## 
+# Midori (0.3.3)
+
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/apps
+# icon
+mv midori.png midori.png_
+
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/actions
+# new_tab
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/window-new.png stock_new-window.png
+# add_bookmark
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/bookmark-new.png stock_add-bookmark.png
+# tab_new
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/add.png stock_new-tab.png
+
+###
+## 
+# FFox3
+
+# GtkEdit Path
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/actions/
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/gtk-execute.png gtk-edit.png
+ln -s document-page-setup.png gtk-edit.png
+
+###
+## 
+# Geany
+
+# document-revert
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/actions/
+#ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/gtk-revert-to-saved-ltr document-revert.png
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/refresh.png document-revert.png
+
+# icon
+#cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/apps
+#mv geany.png geany.png_
+
+###
+## 
+# TuxCmd
+
+# icon
+cd $pkgdir/usr/share/icons/Buuf-Deuce/128x128/apps
+ln -s /usr/share/icons/Buuf-Deuce/128x128/mimetypes/x-directory-nfs-server.png tuxcmd.png
+
+# new_tab
+ln -s /usr/share/icons/Buuf-Deuce/128x128/actions/gtk-new.png \
+	$pkgdir/usr/share/icons/Buuf-Deuce/128x128/actions/gtk-index.png
+
+}

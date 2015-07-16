@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Obmenu
+Comment=Openbox menu editor
+Exec=obmenu
+Icon=obmenu
+Categories=Settings;DesktopSettings;GTK;
+Terminal=false
+Type=Application
+StartupNotify=true

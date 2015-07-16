@@ -1,0 +1,75 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=smokikon-icon-theme
+pkgver=0.9
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="Smokikon - A icon theme in grayscale"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("A clean theme that is easy on the eyes. This is a dark theme in grayscale, and it should look nice on top of a dark gray or black window decoration theme. License: GPL. Homepage: http://gnome-look.org/content/show.php/Smokikon?content=90577"
+)
+
+source=("http://gnome-look.org/CONTENT/content-files/90577-Smokikon_v09.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="themes x11-themes"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+build()
+{
+go_src_dir
+burn_patches
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+go_src_dir
+
+mkdir -p $pkgdir/usr/share/icons/Smokikon
+cp -r ./* $pkgdir/usr/share/icons/Smokikon || exit 1
+
+sed -i 's|Name=Smokikon v0.9|Name=Smokikon|' \
+	$pkgdir/usr/share/icons/Smokikon/index.theme || exit 1
+}

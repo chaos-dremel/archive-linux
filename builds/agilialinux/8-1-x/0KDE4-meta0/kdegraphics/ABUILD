@@ -1,0 +1,12 @@
+pkgname=kdegraphics
+pkgver=4.10.2
+pkgbuild=1
+arch=noarch
+shortdesc=('Graphics programs for KDE')
+tags=('kde-misc virtual')
+adddep=""
+
+build() {
+echo "Building virtual package"
+}
+

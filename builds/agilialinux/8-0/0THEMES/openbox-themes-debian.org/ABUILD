@@ -1,0 +1,73 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=openbox-themes-debian.org
+pkgver=1.0.2
+pkgbuild=1
+arch=('noarch')
+
+shortdesc="темы для оконного менеджера Openbox"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("Пакет содержит различные темы для оконного менеджера Openbox. http://packages.debian.org/lenny/openbox-themes"
+)
+
+source=("http://ftp.de.debian.org/debian/pool/main/o/openbox-themes/openbox-themes_${pkgver}.tar.gz"
+"http://packages.debian.org/changelogs/pool/main/o/openbox-themes/openbox-themes_${pkgver}/openbox-themes.copyright"
+)
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="themes x11-themes"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep="openbox"
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into /usr/docs/${pkgname} dir from sources
+docs=
+gendeps_blacklist=
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+
+mkdir -p ${pkgdir}/usr/{doc/${pkgname}-${pkgver},share/themes}
+}
+
+build()
+{
+go_src_dir
+burn_patches
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+
+rm -rf ./debian
+cp -R ./* ${pkgdir}/usr/share/themes/  || exit 1
+
+cp $srcache/openbox-themes.copyright ${pkgdir}/usr/doc/${pkgname}-${pkgver} || exit 1
+}

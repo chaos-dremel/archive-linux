@@ -1,0 +1,12 @@
+pkgname=kdebase
+pkgver=4.10.2
+pkgbuild=1
+arch=noarch
+shortdesc=('the second mandatory package (besides kdelibs) for KDE')
+tags=('kde-misc virtual')
+adddep=""
+
+build() {
+echo "Building virtual package: $pkgname"
+echo "${shortdesc}"
+}

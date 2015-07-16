@@ -1,0 +1,94 @@
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+prgname=kid3-qt
+pkgname=kid3
+pkgver=1.4
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Kid3 - Tag Editor"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("If you want to easily tag multiple MP3, Ogg/Vorbis, FLAC, MPC, MP4/AAC, "
+	  "MP2, Speex, TrueAudio, WavPack, WMA, WAV and AIFF files (e.g. full albums)" 
+	  "without typing the same information again and again and have control over"
+	  "both ID3v1 and ID3v2 tags, then Kid3 is the program you are looking for."
+""
+	  "Kid3 audio tag editor can edit the tags of MP3, Ogg, FLAC, MPC & WMA files"
+	  "in an efficient way, convert between ID3v1 and ID3v2, set the tags of"
+	  "multiple files, generate tags from file names or vice versa and import"
+	  "from freedb, MusicBrainz and Discogs."
+""
+"Homepage: http://kid3.sourceforge.net/"
+)
+
+source=("http://downloads.sourceforge.net/project/kid3/kid3/${pkgver}/kid3-${pkgver}.tar.gz")
+
+patch_opts=("")
+
+#----------------------------- MOPS vars --------------------------------------
+#--------------------- Специфичные для MOPSLinux ------------------------------
+
+tags="media-sound xapps"     		#short and long tags / длинный и короткий тег
+build_deps="" 			#work only in MOPS
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+author=NK
+email=nk-man@yandex.ru
+
+#numjobs=1 #Set number of jobs while compliling, otherwise it'll be autodetected
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+before_build()
+{
+echo ""
+}
+
+#set configure options, make and make install 
+#конфигурация, сборка, подготовка пакета
+build() 
+{
+cd $startdir/src/$pkgname-$pkgver/$prgname
+
+burn_patches
+
+LDFLAGS="$SLKLDFLAGS" \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+--sysconfdir=/etc \
+--localstatedir=/var \
+--libdir=/usr/lib${LIBDIRSUFFIX} \
+--disable-static \
+--mandir=/usr/man \
+--program-prefix= \
+--program-suffix= \
+--without-kde --without-arts \
+--without-musicbrainz
+                  
+make -j${numjobs} || exit 1
+make install INSTALL_ROOT=$startdir/pkg || exit 1
+
+cd ..
+
+rm -f $startdir/pkg/usr/share/applications/kid3-qt.desktop
+cat $startdir/files/kid3.desktop > $startdir/pkg/usr/share/applications/kid3.desktop
+chmod 644 $startdir/pkg/usr/share/applications/kid3.desktop
+chown root:root $startdir/pkg/usr/share/applications/kid3.desktop
+
+}
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+ echo ""
+}

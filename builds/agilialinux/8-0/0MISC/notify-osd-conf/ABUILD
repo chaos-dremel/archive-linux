@@ -1,0 +1,84 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=notify-osd-conf
+pkgver=0.0
+pkgbuild=1
+arch=('auto')
+
+shortdesc="Notify OSD Configuration"
+#-ruler---|--------------------------------------------------------------------------|
+longdesc=("https://launchpad.net/notifyconf"
+)
+
+source=("bzr:lp:notifyconf")
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="x11-misc xapps"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой
+#before_build()
+#{
+#echo ""
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+sed -i -e 's|\/usr\/share\/qt4\/mkspecs\/linux-g++|\/usr\/share\/qt\/mkspecs\/linux-g++|g' Makefile 
+sed -i -e 's|\/qt4\/QtCore|\/QtCore|g' Makefile 
+sed -i -e 's|\/qt4\/QtGui|\/QtGui|g' Makefile 
+sed -i -e 's|\/usr\/include\/qt4|\/usr\/include\/Qt|g' Makefile 
+sed -i -e 's|qmake-qt4|qmake|g' Makefile 
+sed -i -e 's|\/usr\/share\/qt4|\/usr\/share\/qt|g' Makefile 
+sed -i -e 's|moc-qt4|moc|g' Makefile 
+sed -i -e 's|uic-qt4|uic|g' Makefile 
+
+make || exit 1
+#make DESTDIR=${pkgdir} install || exit 1
+
+install -D -m 755 not.png $pkgdir/usr/share/notifyosdconf/not.png
+install -D -m 755 default.def $pkgdir/usr/share/notifyosdconf/default.def
+install -D -m 755 NotifyOSDConfiguration $pkgdir/usr/bin/notifyconf
+
+}
+
+
+#ran after function build() 
+#после сборки
+after_build()
+{
+echo ""
+}

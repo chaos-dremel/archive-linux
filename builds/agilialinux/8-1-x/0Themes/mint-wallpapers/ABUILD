@@ -1,0 +1,175 @@
+#ABUILD created by/создан: NK, nk-man at yandex.ru 
+#----------------------------- General vars --------------------------------------
+#------------------------- Основные переменные -----------------------------------
+pkgname=mint-wallpapers
+pkgver=16
+pkgbuild=1
+arch=noarch
+
+shortdesc="This package contains quality desktop backgrounds made for Linux Mint (mint-backgrounds)"
+#longdesc=(""
+#)
+
+source=(
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-debian/mint-backgrounds-debian_1.2.tar.gz"
+
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-xfce/mint-backgrounds-xfce_2012.06.21.tar.gz"
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-xfce/mint-backgrounds-xfce_2012.10.31.tar.gz"
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-xfce/mint-backgrounds-xfce_2013.06.10.tar.gz"
+
+
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-helena/mint-backgrounds-helena_1.0.tar.gz"
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-isadora/mint-backgrounds-isadora_1.0.tar.gz"
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-julia/mint-backgrounds-julia_1.0.tar.gz"
+
+
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-katya/mint-backgrounds-katya_1.0.1.tar.gz"
+"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-katya-extra/mint-backgrounds-katya-extra_1.0.1.tar.gz"
+
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-lisa/mint-backgrounds-lisa_1.1.tar.gz"
+"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-lisa-extra/mint-backgrounds-lisa-extra_1.1.tar.gz"
+
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-maya/mint-backgrounds-maya_1.1.tar.gz"
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-maya/mint-backgrounds-maya_1.2.tar.gz"
+"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-maya-extra/mint-backgrounds-maya-extra_1.1.tar.gz"
+
+#"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-nadia/mint-backgrounds-nadia_1.1.tar.gz"
+"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-nadia-extra/mint-backgrounds-nadia-extra_1.0.tar.gz"
+
+
+"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-olivia/mint-backgrounds-olivia_1.4.tar.gz"
+
+"http://packages.linuxmint.com/pool/main/m/mint-backgrounds-petra/mint-backgrounds-petra_1.3.tar.gz"
+)
+
+patch_opts=("")
+
+#----------------------------- AgiliaLinux vars --------------------------------------
+#--------------------- Специфичные для AgiliaLinux ------------------------------
+#short and long tags / длинный и короткий тег
+tags="media-wallpapers themes"
+
+#dependencies only needed to build package
+build_deps=""
+
+provides=""
+conflicts=""
+
+adddep=""
+removedep=""
+
+#for multi pkg abuild
+pkglist=
+
+#Set number of jobs while compliling, otherwise it'll be autodetected
+#numjobs=1
+
+#additional files should be copied into ${pkgdir}/usr/doc/${pkgname}-${pkgver} dir from sources
+docs=
+gendeps_blacklist=
+
+#custom_opts: skip_validate skip_gendeps no_postperm no_strip no_ccache
+custom_opts=""
+
+#----------------------------- Make PKG --------------------------------------
+#-------------------------- Сборка пакета ------------------------------------
+
+#ran before function build()
+#запускается перед сборкой.
+#before_build()
+#{
+#
+#}
+
+build()
+{
+go_src_dir
+burn_patches
+
+mkdir -p $pkgdir/usr/share/wallpapers/mint
+mkdir -p ${pkgdir}/usr/doc/${pkgname}-${pkgver}
+
+
+mintnv (){
+ cd $pkgdir/usr/share/wallpapers/mint
+ # extra walls
+ cp -r $srcdir/mint-backgrounds-${mname}/usr/share/backgrounds/linuxmint-${mname}/ ./${mver}-${mname/-extra/}/
+ mv ./${mver}-${mname/-extra/}/Credits ${pkgdir}/usr/doc/${pkgname}-${pkgver}/Credits-${mver}-${mname/-extra/}
+ # del walls 4 LinuxMint
+ find ./ -type f -name gelsan* -exec rm -v {} ";"
+ find ./ -type f -name linux_mint* -exec rm -v {} ";"
+ find ./ -type f -name *${mname}*.*g -exec rm -v {} ";"
+ # copyright
+ cat $srcdir/mint-backgrounds-${mname}/debian/copyright > ${pkgdir}/usr/doc/${pkgname}-${pkgver}/copyright
+}
+
+
+# w/o 08 mint-backgrounds-helena
+# "http://packages.linuxmint.com/pool/main/m/mint-backgrounds-helena/mint-backgrounds-helena_1.0.tar.gz"
+
+
+# w/o 09 mint-backgrounds-isadora
+# "http://packages.linuxmint.com/pool/main/m/mint-backgrounds-isadora/mint-backgrounds-isadora_1.0.tar.gz"
+
+
+# w/o 10 mint-backgrounds-julia
+# "http://packages.linuxmint.com/pool/main/m/mint-backgrounds-julia/mint-backgrounds-julia_1.0.tar.gz"
+
+
+# w/o 11 mint-backgrounds-katya
+# "http://packages.linuxmint.com/pool/main/m/mint-backgrounds-katya/mint-backgrounds-katya_1.0.1.tar.gz"
+
+# 11 mint-backgrounds-katya-extra
+mname=katya-extra
+mver=11
+mintnv
+
+
+# w/o 12 mint-backgrounds-lisa
+# "http://packages.linuxmint.com/pool/main/m/mint-backgrounds-lisa/mint-backgrounds-lisa_1.1.tar.gz"
+
+# 12 mint-backgrounds-lisa-extra
+mname=lisa-extra
+mver=12
+mintnv
+
+
+# w/o 13 mint-backgrounds-maya
+# "http://packages.linuxmint.com/pool/main/m/mint-backgrounds-maya/mint-backgrounds-maya_1.1.tar.gz"
+# "http://packages.linuxmint.com/pool/main/m/mint-backgrounds-maya/mint-backgrounds-maya_1.2.tar.gz"
+
+# 13 mint-backgrounds-maya-extra
+mname=maya-extra
+mver=13
+mintnv
+
+
+# w/o 14 mint-backgrounds-nadia
+# "http://packages.linuxmint.com/pool/main/m/mint-backgrounds-nadia/mint-backgrounds-nadia_1.1.tar.gz"
+
+# 14 mint-backgrounds-nadia-extra
+mname=nadia-extra
+mver=14
+mintnv
+
+
+# 15 mint-backgrounds-olivia
+mname=olivia
+mver=15
+mintnv
+
+
+# 16 mint-backgrounds-petra
+mname=petra
+mver=16
+mintnv
+
+}
+
+
+#ran after function build() 
+#после сборки
+#after_build()
+#{
+#
+#}

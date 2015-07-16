@@ -1,0 +1,82 @@
+#!/bin/sh
+
+# Slackware build script for Mira (GTK 2.x Theme/Style)
+# Written for MOPSLinux <www.mopslinux.org> by NK <nk-man@yandex.ru>
+# (c) 2009
+
+PRGNAM=mira-gtk-theme
+VERSION=${VERSION:-0.5}
+ARCH=noarch
+BUILD=${BUILD:-1}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp/pkg}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-$CWD}
+
+# URL: http://www.deviantart.com/download/100077120/Mira_by_sen7.tar
+SRCPRGNAM=Mira_by_sen7
+SRCVERSION=$VERSION
+ARC=${ARC:-tar}
+#SRC=http://www.deviantart.com/download/100077120/$SRCPRGNAM.$ARC
+#if [ ! -e $SRC=$SRCPRGNAM.$ARC ]; then
+#	wget -c $SRC
+#fi
+
+set -e
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+mkdir -p $TMP/$PRGNAM-$VERSION
+cd $TMP/$PRGNAM-$VERSION
+
+tar -xf $CWD/$SRCPRGNAM.$ARC
+
+mkdir -p $PKG/usr/share/themes/Mira
+cp -a  Mira/gtk-2.0 $PKG/usr/share/themes/Mira
+mkdir -p $PKG/usr/share/themes/Mirav2
+cp -a  Mirav2/gtk-2.0 $PKG/usr/share/themes/Mirav2
+
+cd $PKG
+
+chown -R root:root .
+chmod -R u+w,go+r-w,a-s .
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+#cat $CWD/doinst.sh > $PKG/install/doinst.sh
+#cat $CWD/postremove.sh > $PKG/install/postremove.sh
+
+#if [ ! -e $CWD/slack-required ]; then
+#    echo "Generating dependencies. This make take a few minutes to complete."
+#    requiredbuilder -v -y -s $CWD $PKG
+#else
+#    cat $CWD/slack-required > $PKG/install/slack-required
+#fi
+
+/sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+
+echo "MPKG"
+PACKAGE_NAME=$PRGNAM
+AUTHOR=${AUTHOR:-NK}
+EMAIL=${EMAIL:-nk-man@yandex.ru}
+mpkg convert $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg -P gendeps2 $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz || exit 1
+mpkg-setmeta $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz \
+  --maintainer-name=$AUTHOR --maintainer-email=$EMAIL --add-tag=themes
+mpkg-validate $CWD/$PACKAGE_NAME-$VERSION-$ARCH-$BUILD.tgz
+
+cd $CWD
+#tar vczf $PRGNAM-$VERSION-$BUILD.tar.gz slack-desc $PRGNAM.SlackBuild $SRCPRGNAM.$ARC
+tar vczf $PACKAGE_NAME-$VERSION-$BUILD.tar.gz slack-desc $PACKAGE_NAME.SlackBuild
+#tar vczf $PRGNAM-$VERSION-$BUILD.tar.gz slack-desc $PRGNAM.SlackBuild slack-required
+#tar vczf $PACKAGE_NAME-$VERSION-$BUILD.tar.gz slack-desc $PACKAGE_NAME.SlackBuild *sh *.desktop
+#tar vczf $PACKAGE_NAME-$VERSION-$BUILD.tar.gz slack-desc $PACKAGE_NAME.SlackBuild doinst.sh
+
+#echo "delete build garbage"
+rm -rf $PKG $TMP/$PRGNAM-$VERSION /tmp/mpkg*
+
+echo "DONE"
